@@ -1,0 +1,9 @@
+results/*
+.Rhistory
+.Rproj.user/
+DAR_ABC.Rproj
+data/*
+logo/*
+results_old
+results_old/*
+
