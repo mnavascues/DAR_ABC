@@ -10,11 +10,10 @@ load(file = "results/Bevan_num_of_sims.rda")
 load(file = "results/Bevan_sumstats.rda")
 
 # lead reference tables for piecewise model
-load(file = "results/Bevan_piecewise_fixed_m_model_reftable.rda")
+load(file = "results/Bevan_piecewise_model_reftable.rda")
 
 load(file = "results/Bevan_time_range_BP.rda")
-load(file="results/Bevan_m_hat.rda")
-num_of_periods = round(m_hat)
+num_of_periods = round((time_range_BP[1] - time_range_BP[2]) / 100 / 4)
 skyline_years = get_time_of_change(num_of_periods, time_range_BP, intervals="regular")
 
 OOB_year = skyline_years[round(length(skyline_years)/2)]

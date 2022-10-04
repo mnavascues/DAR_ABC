@@ -11,7 +11,6 @@ load(file = "results/Bevan_sumstats.rda")
 load(file = "results/Bevan_piecewise_model_reftable.rda")
 
 load(file = "results/Bevan_time_range_BP.rda")
-#load(file="results/Bevan_m_hat.rda")
 num_of_periods = round((time_range_BP[1] - time_range_BP[2]) / 100 / 4)
 skyline_years = get_time_of_change(num_of_periods, time_range_BP, intervals="regular")
 
@@ -118,13 +117,13 @@ step_wise_years = c(skyline_years[1],rep(skyline_years[2:(length(skyline_years)-
 par(mar=c(4.5, 4.5, 1, 1) + 0.1)
 plot(step_wise_years, rep(rate_hat,each=2),
      xlab = "Years cal BP", ylab=expression(italic(r)),
-     lwd=2, type="l", xlim = time_range_BP, ylim=c(-0.018,0.018), col=PCI_blue)
+     lwd=2, type="l", xlim = time_range_BP, ylim=c(-0.006,0.006), col=PCI_blue)
 lines(step_wise_years,rep(rate_95low,each=2),lty=3, lwd=2,col=PCI_blue)
 lines(step_wise_years,rep(rate_95upp,each=2),lty=3, lwd=2,col=PCI_blue)
 abline(h=0,col="gray")
-points( skyline_years[which(rate_95low>0)]-70, rep(-0.0185,sum(rate_95low>0)),
+points( skyline_years[which(rate_95low>0)]-196.5, rep(-0.0059,sum(rate_95low>0)),
         pch="*", cex=2.5, col=PCI_blue )
-points( skyline_years[which(rate_95upp<0)]-70, rep(-0.0185,sum(rate_95upp<0)),
+points( skyline_years[which(rate_95upp<0)]-196.5, rep(-0.0059,sum(rate_95upp<0)),
         pch="*", cex=2.5, col=PCI_blue )
 dev.off()
 
