@@ -21,8 +21,8 @@ if (!file.exists("results/Bevan_constant_model_reftable.rda") ){
   reftable <- foreach(sim=seq_len(num_of_sims), .combine=rbind) %dopar% {
     gc()
     lambda = exp(runif(1,log(lambda_min),log(lambda_max)))
-    demograhy = rep(lambda, length(t_))
-    ss = sim_all(demograhy, t_, SPD=F, errors=dates$Error, runm=100, window=100)
+    demography = rep(lambda, length(t_))
+    ss = sim_all(demography, t_, SPD=F, errors=dates$Error, runm=100, window=100)
     params = as.data.frame(lambda)
     cbind(params,ss)
   }

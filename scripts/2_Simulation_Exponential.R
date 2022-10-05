@@ -21,11 +21,11 @@ if (!file.exists("results/Bevan_exponential_model_reftable.rda") ){
   registerDoRNG(seed = 1234567)
   reftable <- foreach(sim=seq_len(num_of_sims), .combine=rbind) %dopar% {
     gc()
-    demograhy = get_exponential_model(lambda_min,lambda_max,time_range_BP,expansion=T)
-    ss = sim_all(demograhy$lambda_t, t_, SPD=F, errors=dates$Error, runm=100, window=100)
-    params = as.data.frame(t(c(demograhy$lambda_0,
-                               demograhy$lambda_f,
-                               demograhy$rate)))
+    demography = get_exponential_model(lambda_min,lambda_max,time_range_BP,expansion=T)
+    ss = sim_all(demography$lambda_t, t_, SPD=F, errors=dates$Error, runm=100, window=100)
+    params = as.data.frame(t(c(demography$lambda_0,
+                               demography$lambda_f,
+                               demography$rate)))
     names(params) = c("lambda_0","lambda_f","r")
     cbind(params,ss)
   }

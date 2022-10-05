@@ -30,20 +30,20 @@ if (!file.exists("results/Bevan_piecewise_model_reftable.rda") ){
   reftable <- foreach(sim=seq_len(num_of_sims), .combine=rbind) %dopar% {
     gc()
     # num_of_periods = round(exp(runif(1,log(2),log(max_num_of_periods))))
-    demograhy = get_piecewise_exponential_model(num_of_periods,
+    demography = get_piecewise_exponential_model(num_of_periods,
                                                 lambda_min,
                                                 lambda_max,
                                                 time_range_BP,
                                                 intervals = "regular",
                                                 skyline = F)
-    ss = sim_all(demograhy$lambda_t, 
+    ss = sim_all(demography$lambda_t, 
                  t_, 
                  SPD = F, 
                  errors = dates$Error, 
                  runm = 100, 
                  window = 100)
-    params = as.data.frame(t(c(demograhy$lambda_skyline,
-                               demograhy$rate_skyline,
+    params = as.data.frame(t(c(demography$lambda_skyline,
+                               demography$rate_skyline,
                                num_of_periods)))
     names(params) = c(paste0("lambda", skyline_years),
                       paste0("rate", skyline_years[1:(length(skyline_years)-1)]+(skyline_years[1]-skyline_years[2])/2),
