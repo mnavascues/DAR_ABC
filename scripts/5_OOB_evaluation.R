@@ -16,7 +16,7 @@ load(file = "results/Bevan_time_range_BP.rda")
 num_of_periods = round((time_range_BP[1] - time_range_BP[2]) / 100 / 4)
 skyline_years = get_time_of_change(num_of_periods, time_range_BP, intervals="regular")
 
-OOB_year = skyline_years[round(length(skyline_years)/2)]
+OOB_year = 5500 #skyline_years[round(length(skyline_years)/2)]
 
 sumstats = reftable[names(all_sumstats_c14)]
 param_name = paste0("lambda",OOB_year)
@@ -51,7 +51,7 @@ dev.off()
 
 sumstats = reftable[names(all_sumstats_c14)]
 
-param_name = paste0("rate",5641-(5641-5500)/2)
+param_name = paste0("rate",5893-(5893-5500)/2)
 param_index = which(names(reftable)==param_name)
 param = reftable[param_index]
 names(param) = "param"
@@ -69,13 +69,13 @@ pdf(file="results/Bevan_piecewise_OOB_rate.pdf", width=5, height=5)
 hexbinplot(rate_hat~rate, data=df,
            ylab=expression(hat(italic(r))),
            xlab=expression(italic(r)),
-           xlim=c(-0.018, 0.018),ylim=c(-0.018, 0.018),
+           xlim=c(-0.006, 0.006),ylim=c(-0.006, 0.006),
            trans=log, inv=exp,
            panel= function(...){
              panel.hexbinplot(...)
-             panel.xyplot(x = seq(-0.016, 0.016,0.0001), y = seq(-0.016, 0.016,0.0001),
+             panel.xyplot(x = seq(-0.006, 0.006,0.00001), y = seq(-0.006, 0.006, 0.00001),
                           cex = 0.1, col = PCI_blue, fill = PCI_blue)
-             panel.xyplot(x = -0.016, y = 0.016, pch="b", cex = 3, col = "black")
+             panel.xyplot(x = -0.005, y = 0.005, pch="b", cex = 3, col = "black")
            })
 dev.off()
 
