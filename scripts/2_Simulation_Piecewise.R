@@ -8,10 +8,10 @@ source("scripts/sim14c.R")
 set.seed(24)
 ncores = 30
 
-load(file = "results/Bevan_dates.rda")
-load(file = "results/Bevan_time_range_BP.rda")
-load(file = "results/Bevan_num_of_sims.rda")
-load(file = "results/Bevan_lambda_prior.rda")
+load(file = "results/dates.rda")
+load(file = "results/time_range_BP.rda")
+load(file = "results/num_of_sims.rda")
+load(file = "results/lambda_prior.rda")
 
 # max_num_of_periods = 1000
 # skyline_years = seq(time_range_BP[1], time_range_BP[2], by = -100)
@@ -22,7 +22,7 @@ skyline_years = get_time_of_change(num_of_periods, time_range_BP,
 
 
 # make reference tables for piecewise exponential models
-if (!file.exists("results/Bevan_piecewise_model_reftable.rda") ){
+if (!file.exists("results/piecewise_model_reftable.rda") ){
   # setup parallel computing
   cl <- makeCluster(ncores, type="FORK")  
   registerDoParallel(cl)  
@@ -53,7 +53,7 @@ if (!file.exists("results/Bevan_piecewise_model_reftable.rda") ){
     #                  "num_of_periods")
     cbind(params,ss)
   }
-  save(reftable, file="results/Bevan_piecewise_model_reftable.rda")
+  save(reftable, file="results/piecewise_model_reftable.rda")
   stopCluster(cl) 
 }
 

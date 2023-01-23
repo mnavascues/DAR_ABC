@@ -2,15 +2,15 @@ library(abcrf)
 source("../../Misc_R_tools/color.R")
 source("scripts/sim14c.R")
 
-load(file = "results/Bevan_num_of_sims.rda")
+load(file = "results/num_of_sims.rda")
 
 # load target (i.e. observed) summary statistics
-load(file = "results/Bevan_sumstats.rda")
+load(file = "results/sumstats.rda")
 
 # lead reference tables for exponential model
-load(file = "results/Bevan_exponential_model_reftable.rda")
+load(file = "results/exponential_model_reftable.rda")
 
-if ( !file.exists("results/Bevan_exponential_posterior.rda") ){
+if ( !file.exists("results/exponential_posterior.rda") ){
 
   sumstats = reftable[names(all_sumstats_c14)]
   
@@ -37,9 +37,9 @@ if ( !file.exists("results/Bevan_exponential_posterior.rda") ){
   
   save(RF_r, posterior_r,
        RF_log10lambda_0, posterior_log10lambda_0,
-       RF_log10lambda_f, posterior_log10lambda_f, file="results/Bevan_exponential_posterior.rda")
+       RF_log10lambda_f, posterior_log10lambda_f, file="results/exponential_posterior.rda")
 }
-#load(file="results/Bevan_exponential_posterior.rda")
+#load(file="results/exponential_posterior.rda")
 (posterior_log10lambda_0)
 (posterior_log10lambda_f)
 (posterior_r)
@@ -52,11 +52,11 @@ r_hat = posterior_r$med[1]
 r_CI = posterior_r$quantiles
 save(r_hat, r_CI,
      lambda_0_hat, lambda_0_CI,
-     lambda_f_hat, lambda_f_CI, file="results/Bevan_lambda_hat_exponential.rda")
+     lambda_f_hat, lambda_f_CI, file="results/lambda_hat_exponential.rda")
 
-load(file="results/Bevan_lambda_hat_exponential.rda")
+load(file="results/lambda_hat_exponential.rda")
 
-pdf(file="results/Bevan_posterior_lambda_0_exponential.pdf", width=10, height=5)
+pdf(file="results/posterior_lambda_0_exponential.pdf", width=10, height=5)
 breaks= seq(-3,1.1,0.1)
 hist(log10(reftable$lambda_0),
      breaks = breaks,
@@ -72,7 +72,7 @@ wtd.hist(log10(reftable$lambda_0),
 box()
 dev.off()
 
-pdf(file="results/Bevan_posterior_lambda_f_exponential.pdf", width=10, height=5)
+pdf(file="results/posterior_lambda_f_exponential.pdf", width=10, height=5)
 breaks= seq(-3,1.1,0.1)
 hist(log10(reftable$lambda_f),
      breaks = breaks,
@@ -88,7 +88,7 @@ wtd.hist(log10(reftable$lambda_f),
 box()
 dev.off()
 
-pdf(file="results/Bevan_posterior_r_exponential.pdf", width=10, height=5)
+pdf(file="results/posterior_r_exponential.pdf", width=10, height=5)
 breaks= seq(0,0.0009,0.00002)
 hist(reftable$r,
      breaks = breaks,
@@ -104,10 +104,10 @@ wtd.hist(reftable$r,
 box()
 dev.off()
 
-load(file = "results/Bevan_spd.rda")
-load(file = "results/Bevan_time_range_BP.rda")
+load(file = "results/spd.rda")
+load(file = "results/time_range_BP.rda")
 
-pdf(file="results/Bevan_exponential_model_result.pdf", width=10, height=5)
+pdf(file="results/exponential_model_result.pdf", width=10, height=5)
 par(mar=c(4.5, 4.5, 1, 1) + 0.1)
 plot(allspd$grid$calBP, allspd$grid$PrDens, xlim = time_range_BP, ylim = c(0.01,10), log = "y",
      type="l", xlab="Years cal BP", ylab=expression(lambda), col="grey", lwd=2)

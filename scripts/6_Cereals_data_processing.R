@@ -2,8 +2,8 @@ library(rcarbon)
 source("../../Misc_R_tools/color.R")
 source("scripts/sim14c.R")
 
-load(file = "results/Bevan_dates.rda")
-load(file = "results/Bevan_caldates.rda")
+load(file = "results/dates.rda")
+load(file = "results/caldates.rda")
 load(file = "results/Cereals_time_range_BP.rda")
 
 entries2exclude = c("Hordeum/Triticum",

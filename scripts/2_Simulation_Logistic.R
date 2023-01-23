@@ -8,13 +8,13 @@ source("scripts/sim14c.R")
 set.seed(24)
 ncores = 30
 
-load(file = "results/Bevan_dates.rda")
-load(file = "results/Bevan_time_range_BP.rda")
-load(file = "results/Bevan_num_of_sims.rda")
-load(file = "results/Bevan_lambda_prior.rda")
+load(file = "results/dates.rda")
+load(file = "results/time_range_BP.rda")
+load(file = "results/num_of_sims.rda")
+load(file = "results/lambda_prior.rda")
 
 # make a reference table logistic expansion model
-if (!file.exists("results/Bevan_logistic_model_reftable.rda") ){
+if (!file.exists("results/logistic_model_reftable.rda") ){
   # setup parallel computing
   cl <- makeCluster(ncores, type="FORK")  
   registerDoParallel(cl)  
@@ -31,5 +31,5 @@ if (!file.exists("results/Bevan_logistic_model_reftable.rda") ){
     cbind(params,ss)
   }
   stopCluster(cl) 
-  save(reftable,file="results/Bevan_logistic_model_reftable.rda")
+  save(reftable,file="results/logistic_model_reftable.rda")
 }

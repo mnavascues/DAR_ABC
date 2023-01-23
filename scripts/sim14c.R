@@ -26,6 +26,7 @@ get_logistic_model = function(lambda_min, lambda_max, time_range, expansion = FA
   K = max(lambda) + exp(runif(1,log(lambda_min),log(lambda_max)))
   while (K*lambda[1]/lambda[2]-lambda[1] <= 0 | K-lambda[1] <= 0){
     lambda = exp(runif(2,log(lambda_min),log(lambda_max)))
+    if (expansion) lambda = sort(lambda)
     K = max(lambda) + exp(runif(1,log(lambda_min),log(lambda_max)))
   }
   r = (log(K-lambda[1]) - log(K*lambda[1]/lambda[2]-lambda[1])) / (time_range[1] - time_range[2])
@@ -37,6 +38,40 @@ get_logistic_model = function(lambda_min, lambda_max, time_range, expansion = FA
               lambda_K=K,
               rate=r))
 }
+
+get_dynamic_model = function(lambda_min, lambda_max,
+                             b0_min, b0_max,
+                             b1_min, b1_max,
+                             b2_min, b2_max,
+                             d, time_range){
+  time_seq = seq(time_range[1], time_range[2] + 1,by = -1)
+  lambda_t = array(NA, length(time_seq))
+
+  while(lambda_t[length(lambda_t)]==0 | is.na(lambda_t[length(lambda_t)])){
+    lambda_0 = exp(runif(1, log(lambda_min), log(lambda_max)))
+    b0 = exp(runif(1, log(b0_min), log(b0_max)))
+    b1 = -exp(runif(1, log(b1_min), log(b1_max)))
+    b2 = -exp(runif(1, log(b2_min), log(b2_max)))
+    ref_d = rnorm(1, mean = mean(d), sd = sd(d))
+    
+    D = d - ref_d
+    for (i in seq_along(time_seq)){
+      if (i == 1) {
+        lambda_t[i] = lambda_0
+      }else{
+        lambda_t[i] = lambda_t[i-1] * exp(b0 + b1 * lambda_t[i-1]^2 + b2 * D[i]^2) 
+      }
+    }
+  }
+
+  return(list(lambda_t = lambda_t,
+              lambda_0 = lambda_0,
+              b0 = b0,
+              b1 = b1,
+              b2 = b2,
+              d = ref_d))
+}
+
 # simulate demographic values under a piecewise demographic model
 get_lambda_values_piecewise_model = function(num_of_periods,lambda_min,lambda_max){
   lambda_values = array(NA,num_of_periods)
@@ -118,21 +153,52 @@ get_piecewise_exponential_model = function(num_of_periods,lambda_min,lambda_max,
 }
 
 get_piecewise_exponential_model_2_categories = function(num_of_periods,
-                                                        lambda_min,lambda_max,
-                                                        alpha, beta,
-                                                        time_range, intervals="regular", skyline=F){
-  time_of_change = get_time_of_change(num_of_periods,time_range,intervals=intervals)
-  lambda_values = get_lambda_values_piecewise_model(num_of_periods+1,lambda_min,lambda_max)
-
-  pi = rbeta(num_of_periods+1,alpha,beta)
-  lambda_values_A = pi * lambda_values
-  lambda_values_B = (1 - pi) * lambda_values
+                                                        lambda_min, lambda_max,
+                                                        model = "independent", # "correlated" "proportional"
+                                                        alpha = NULL, beta = NULL, pi = NULL,
+                                                        time_range){
+  time_of_change = get_time_of_change(num_of_periods, time_range, intervals = "regular")
   
-  growth_rates_A = get_growth_rates(num_of_periods,log(lambda_values_A),time_of_change)
-  growth_rates_B = get_growth_rates(num_of_periods,log(lambda_values_B),time_of_change)
+  if (model == "proportional" & !is.null(pi) ){
+    lambda_values = get_lambda_values_piecewise_model(num_of_periods + 1, lambda_min, lambda_max)
+    growth_rates = get_growth_rates(num_of_periods,log(lambda_values),time_of_change)
+    
+    lambda_values_A = pi * lambda_values
+    growth_rates_A = get_growth_rates(num_of_periods,log(lambda_values_A),time_of_change)
+    lambda_values_B = (1 - pi) * lambda_values
+    growth_rates_B = get_growth_rates(num_of_periods,log(lambda_values_B),time_of_change)
+    
+  } else if (model == "correlated" & !is.null(alpha) & !is.null(beta) ){
+    lambda_values = get_lambda_values_piecewise_model(num_of_periods + 1, lambda_min, lambda_max)
+    growth_rates = get_growth_rates(num_of_periods,log(lambda_values),time_of_change)
+    
+    pi = rbeta(num_of_periods + 1,alpha,beta)
+    
+    lambda_values_A = pi * lambda_values
+    growth_rates_A = get_growth_rates(num_of_periods,log(lambda_values_A),time_of_change)
+    lambda_values_B = (1 - pi) * lambda_values
+    growth_rates_B = get_growth_rates(num_of_periods,log(lambda_values_B),time_of_change)
+    
+  } else {
+    if (model == "proportional" & is.null(pi)){
+      cat("Value for pi is NULL, running model 'independent' instead of 'proportional'\n")
+    } else if (model == "correlated" & ( is.null(alpha) | is.null(beta) )){
+      cat("Value for alpha or beta is NULL, running model 'independent' instead of 'correlated'\n")
+    } else if (model != "independent"){
+      cat("Undefined model, running model 'independent'\n")
+    }
+    
+    lambda_values_A = get_lambda_values_piecewise_model(num_of_periods+1,lambda_min,lambda_max)
+    growth_rates_A = get_growth_rates(num_of_periods,log(lambda_values_A),time_of_change)
+    
+    lambda_values_B = get_lambda_values_piecewise_model(num_of_periods+1,lambda_min,lambda_max)
+    growth_rates_B = get_growth_rates(num_of_periods,log(lambda_values_B),time_of_change)
+    
+  }
+  
+
   lambda_t_A = lambda_t_B = numeric()
-  r_t_A = numeric()
-  r_t_B = numeric()
+  r_t_A = r_t_B = numeric()
   for (i in 1:num_of_periods){
     lambda_t_A = c(lambda_t_A,
                    lambda_values_A[i] * exp(growth_rates_A[i]*seq_len(abs(time_of_change[i+1]-time_of_change[i])) ) )
@@ -141,21 +207,16 @@ get_piecewise_exponential_model_2_categories = function(num_of_periods,
                    lambda_values_B[i] * exp(growth_rates_B[i]*seq_len(abs(time_of_change[i+1]-time_of_change[i])) ) )
     r_t_B = c(r_t_B, rep(growth_rates_B[i],abs(time_of_change[i+1]-time_of_change[i])))
   }
-  if (intervals == "dirichlet" | skyline){
-    return(NA)
-  }else if (intervals == "regular" & !skyline){
-    lambda_skyline = lambda_values
-    rate_skyline = growth_rates
-  }
-  
-  return(list(lambda_t_A     = lambda_t_A,
-              lambda_t_B     = lambda_t_B,
-              alpha          = alpha,
-              beta           = beta,
-              pi             = pi,
-              lambda_skyline = lambda_values,
-              rate_skyline_A = growth_rates_A,
-              rate_skyline_B = growth_rates_B))
+
+  return(list(lambda_t_A      = lambda_t_A,
+              lambda_t_B      = lambda_t_B,
+              alpha           = alpha,
+              beta            = beta,
+              pi              = if (length(pi)>1) {mean(pi)} else {pi},
+              lambda_values_A = lambda_values_A,
+              growth_rates_A  = growth_rates_A,
+              lambda_values_B = lambda_values_B,
+              growth_rates_B  = growth_rates_B))
 }
 
 # simulate number of items and their age in the archaeological record giving a model with lambda_t
@@ -292,14 +353,23 @@ get_sumstats_correlation = function(ssA,ssB){
     PcovQ = cov(QA, QB, method = "pearson")
     KcovQ = cov(QA, QB, method = "kendall")
     ScovQ = cov(QA, QB, method = "spearman")
-    
+
+    ratioABtot  = ssA[,"count"]/ssB[,"count"]
+    ratioABhist = (1+HA)/(1+HB)
+    ratioABhist_names = character()
+    for (i in seq_along(Hss)){
+      ratioABhist_names = c(ratioABhist_names, paste0("ratioABhist",strsplit(Hss[i],"hist")[[1]][2]))
+    }
+        
     sumstats = c(PcorH, KcorH, ScorH, PcovH, KcovH, ScovH, 
                  PcorD, KcorD, ScorD, PcovD, KcovD, ScovD, 
-                 PcorQ, KcorQ, ScorQ, PcovQ, KcovQ, ScovQ)
+                 PcorQ, KcorQ, ScorQ, PcovQ, KcovQ, ScovQ,
+                 ratioABtot, ratioABhist)
   } 
   names(sumstats) = c("PcorH", "KcorH", "ScorH", "PcovH", "KcovH", "ScovH", 
                       "PcorD", "KcorD", "ScorD", "PcovD", "KcovD", "ScovD", 
-                      "PcorQ", "KcorQ", "ScorQ", "PcovQ", "KcovQ", "ScovQ")
+                      "PcorQ", "KcorQ", "ScorQ", "PcovQ", "KcovQ", "ScovQ",
+                      "ratioABtot", ratioABhist_names)
   return(as.data.frame(t(sumstats)))
 }
 
@@ -348,15 +418,20 @@ sim_2_categories = function(lambda_t_A, lambda_t_B, t_values,
     dates = sim_dates(lambda_t, t_values)
     if (length(dates)>0){
       dates_uncalibrated = sim_14Cdates(dates, calCurves, errors = errors)
-      sumstats = get_sumstats_uncalibrated(dates_uncalibrated$C14Age, time_range)
     }else{
       dates_uncalibrated = list(C14Age = numeric(), C14SD = numeric())
-      sumstats = get_sumstats_uncalibrated(dates_uncalibrated$C14Age, time_range)
     }
+    sumstats = get_sumstats_uncalibrated(dates_uncalibrated$C14Age, time_range)
     if (i == 1) all_dates_uncalibrated = dates_uncalibrated
-    if (i == 2) all_dates_uncalibrated = rbind(all_dates_uncalibrated, dates_uncalibrated)
+    if (i == 2) all_dates_uncalibrated = list(C14Age = c(dates_uncalibrated$C14Age,
+                                                         all_dates_uncalibrated$C14Age),
+                                              C14SD  = c(dates_uncalibrated$C14SD,
+                                                         all_dates_uncalibrated$C14SD))
     if (i == 1) sumstats_14C_A = sumstats
     if (i == 2) sumstats_14C_B = sumstats
+  }
+  if (length(all_dates_uncalibrated$C14Age)==0){
+    all_dates_uncalibrated = list(C14Age = numeric(), C14SD = numeric())
   }
   sumstats_14C_all = get_sumstats_uncalibrated(all_dates_uncalibrated$C14Age, time_range)
   sumstats_cor = get_sumstats_correlation(sumstats_14C_A, sumstats_14C_B)
