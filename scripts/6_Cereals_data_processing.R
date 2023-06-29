@@ -71,12 +71,16 @@ dev.off()
 pdf(file="results/Cereals_hist.pdf", width=10, height=5)
 par(mar=c(4.5, 4.5, 1, 1) + 0.1)
 hordeum_weights = apply(as.array(hordeum_bins), 1, function(x) 1/sum(hordeum_bins == x))
-breaks = seq(time_range_BP[1],time_range_BP[2]-1,-100)
-HH = wtd.hist(hordeum_dates$CRA, breaks=breaks, plot=T, weight = hordeum_weights,
-         main="",xlim=time_range_BP, xlab="Years BP (uncalibrated)",col="gray")
+breaks = seq(6000,200,-100)
+HH = wtd.hist(hordeum_dates$CRA,
+              breaks=breaks, 
+              plot=T, weight = hordeum_weights,
+              main="",
+              xlim=time_range_BP, 
+              xlab="Years BP (uncalibrated)",col="gray")
 
 triticum_weights = apply(as.array(triticum_bins), 1, function(x) 1/sum(triticum_bins == x))
-breaks = seq(time_range_BP[1],time_range_BP[2]-1,-100)
+#breaks = seq(time_range_BP[1],time_range_BP[2]-1,-100)
 TH = wtd.hist(triticum_dates$CRA, breaks=breaks, plot=T, weight = triticum_weights,
          main="",xlim=time_range_BP, xlab="Years BP (uncalibrated)",col=PCI_t_blue,add=T)
 box()

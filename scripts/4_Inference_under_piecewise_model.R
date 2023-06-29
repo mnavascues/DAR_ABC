@@ -94,6 +94,7 @@ plot(allspd$grid$calBP, allspd$grid$PrDens, xlim = time_range_BP, ylim = c(0.04,
 lines(skyline_years, lambda_hat, col = PCI_blue, lwd = 2)
 lines(skyline_years, lambda_95CI_low, lty = 2, lwd = 2, col = PCI_blue)
 lines(skyline_years, lambda_95CI_upp, lty = 2, lwd = 2, col = PCI_blue)
+text(time_range_BP[1],6,"a",cex=2)
 dev.off()
 
 
@@ -121,6 +122,7 @@ points( skyline_years[which(rate_95CI_low>0)]-196.5, rep(0,sum(rate_95CI_low>0))
         pch="*", cex=2)
 points( skyline_years[which(rate_95CI_upp<0)]-196.5, rep(0,sum(rate_95CI_upp<0)),
         pch="*", cex=2)
+text(time_range_BP[1],0.006,"b",cex=2)
 dev.off()
 
 
@@ -138,13 +140,13 @@ for (i in seq_len(length(skyline_years))){
   pdf_file_name = paste0("results/posterior_lambda_",skyline_years[i],"_piecewise.pdf")
   pdf(file=pdf_file_name, width=4, height=4)
   par(mar=c(4.5, 4.5, 1, 1) + 0.1)
-  breaks= seq(-3,1.1,0.02)
+  breaks= seq(-3,1.1,0.05)
   
   hist(log10(t(reftable[param_index])),
        breaks = breaks,
        main = "",
        xlab = bquote(log[10]*lambda[.(skyline_years[i])]),
-       ylim = c(0,10),
+       ylim = c(0,5),
        col = adjustcolor( "gray", alpha.f = 0.6), freq = F)
   wtd.hist(log10(t(reftable[param_index])),
            breaks = breaks,

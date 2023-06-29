@@ -177,14 +177,14 @@ temperature = with(gisp2, data.frame(approx(YBP,Temperature,xout=dates_4_interpo
 
 pdf(file="results/posterior_d_dynamic.pdf", width=4, height=4)
 par(mar=c(4.5, 4.5, 1, 1) + 0.1)
-breaks= seq(-4,4,0.1)
-hist(reftable$d-mean(temperature$y),
+breaks= seq(-34,-27,0.1)
+hist(reftable$d,#-mean(temperature$y),
      breaks = breaks,
      main="",#expression("Posterior probabilty number of periods ("*italic(m)*")"),
      xlab=expression(italic(d)),
-     ylim=c(0,.6), xlim=c(-2.5,2.5),
+     ylim=c(0,.7), xlim=c(-34,-27),
      col=adjustcolor( "gray", alpha.f = 0.6),freq=F)
-wtd.hist(reftable$d-mean(temperature$y),
+wtd.hist(reftable$d,#-mean(temperature$y),
          breaks = breaks,
          col=PCI_t_blue,
          weight = posterior_d$weights,

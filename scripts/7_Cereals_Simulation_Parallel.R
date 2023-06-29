@@ -18,7 +18,7 @@ skyline_years = get_time_of_change(num_of_periods, time_range_BP,
                                    intervals = "regular")
 
 # make reference tables for piecewise exponential models
-if (!file.exists("results/Cereals_correlated_model_reftable.rda") ){
+if (!file.exists("results/Cereals_parallel_model_reftable.rda") ){
   # setup parallel computing
   cl <- makeCluster(ncores, type="FORK")  
   registerDoParallel(cl)  
@@ -27,14 +27,14 @@ if (!file.exists("results/Cereals_correlated_model_reftable.rda") ){
     gc()
  
     na_in_demography = T
-    alpha = beta = 1
-    pi = NA
+    alpha = beta = NA
+    pi = rbeta(1,1,1)
     demography = get_piecewise_exponential_model_2_categories(num_of_periods,
                                                               lambda_min,
                                                               lambda_max,
-                                                              model = "correlated",
-                                                              alpha, beta,
-                                                              pi = NULL,
+                                                              model = "parallel",
+                                                              alpha = NULL, beta = NULL,
+                                                              pi,
                                                               time_range_BP)
     
     #plot(demography$lambda_t_B, type = "l", lwd = 2, ylim = c(0, lambda_max))
@@ -83,10 +83,10 @@ if (!file.exists("results/Cereals_correlated_model_reftable.rda") ){
   reftable = reftable[!is.na(reftable$count),]
   reftable = reftable[reftable$count!=1,]
   
-  save(reftable, file="results/Cereals_correlated_model_reftable.rda")
+  save(reftable, file="results/Cereals_parallel_model_reftable.rda")
   stopCluster(cl) 
 }
-# load( file="results/Cereals_correlated_model_reftable.rda")
+# load( file="results/Cereals_parallel_model_reftable.rda")
 
 
 

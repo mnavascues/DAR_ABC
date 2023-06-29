@@ -1,0 +1,578 @@
+%%%  TO FORMAT A PREPRINT To submit to a PCI.  If accepted then use this main.tex with the package of accepted article and search for [IF ACCEPTED] comments  %%%
+
+\documentclass[a4paper]{article}
+
+%%%   SET THE TITLE   %%%
+\newcommand{\preprinttitle}{Analysis of the Dated Archaeological Record through Approximate Bayesian Computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%  SET THE LIST OF AUTHORS WITH CORRESPONDING AFFILIATIONS  use \& before last author %%%
+\newcommand{\listauthors}{\raggedright 
+Miguel de Navascués\textsuperscript{1,2,\includegraphics[height=0.25cm]{ORCID.pdf}}
+}
+%%%%%%%%%%%%%%%%%%%%
+
+
+%%%  SET THE LIST OF AFFILIATIONS  %%%
+\newcommand{\listinstitutions}{
+\textsuperscript{1} CBGP, INRAE, CIRAD, IRD, Montpellier SupAgro, Univ Montpellier, Montpellier, France
+\\
+\textsuperscript{2} Human Evolution, Department of Organismal Biology, Uppsala University, Uppsala, Sweden
+\\
+\includegraphics[height=0.3cm]{ORCID.pdf} \href{http://orcid.org/0000-0001-8342-6047}{0000-0001-8342-6047} 
+}
+%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%  SET THE 'CORRESPONDENCE TO'  %%%
+\newcommand{\email}{miguel.navascues@inrae.fr}
+%%%%%%%%%%%%%%%%%%%%%%
+
+%%%  SET THE ABSTRACT %%%
+\newcommand{\preprintabstract}{The study of the abundance of radiocarbon dates has emerged as a promising source of information for archaeology. However, until recently, the analysis of these data lacked the use of statistical tools that allow for model choice, model fitting and quantification of uncertainty. In this work we propose a generative model for the dated archaeological record and the use of approximate Bayesian computation to perform model choice and parameter inference under that model. The application of this approach provides a quantitative evaluation of models and parameters, which allows for an interpretation of the data that goes beyond verbal description of patterns. As an example, the method is applied to a previously published dataset or radiocarbon dates from Britain and Ireland. The results offer an estimation of the abundance of radiocarbon dates through time that includes credible intervals to quantify the uncertainty and identify the periods in which the rate of change is significant. Our results provide no evidence of a relationship with climate (temperature). The application of the methods to the subset of samples constituted by wheat and barley shows that the dynamics of the abundance of samples for those two cereals is not independent and a significant shift in their relative abundance. This work provides a formal model for the description of the dated archaeological record, with parameters that have an intuitive meaning unlinked to the usual demographic interpretation. We also proposed the use of approximate Bayesian computation as a flexible framework to test specific hypothesis and identify period of interest.}
+%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%  SET THE KEYWORDS  %%%
+\newcommand{\preprintkeywords}{radiocarbon dating; demography; likelihood-free inference; simulation}
+%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%% [IF ACCEPTED] UNCOMMENT TO CHOOSE A PCI %%%
+%\newcommand{\PCI}{Peer Community In Zoology}
+%\newcommand{\PCI}{Peer Community In Ecology}
+%\newcommand{\PCI}{Peer Community In Evolutionary Biology}
+%\newcommand{\PCI}{Peer Community In Paleontology}
+%\newcommand{\PCI}{Peer Community In Archaeology}
+%\newcommand{\PCI}{Peer Community In Animal Science}
+%\newcommand{\PCI}{Peer Community In Genomics}
+%\newcommand{\PCI}{Peer Community In Neuroscience}
+%\newcommand{\PCI}{Peer Community In Mathematical and Computational Biology}
+%\newcommand{\PCI}{Peer Community In Forest and Wood Sciences}
+%\newcommand{\PCI}{Peer Community In Ecotoxicology and Environmental Chemistry}
+%\newcommand{\PCI}{Peer Community In Infections}
+%\newcommand{\PCI}{Peer Community In Registered Reports}
+%\newcommand{\PCI}{Peer Community In Network Science}
+%\newcommand{\PCI}{Peer Community In Microbiology}
+%%%%%%%%%%%%%%%%%%%%%
+
+%%%  [IF ACCEPTED] UNCOMMENT AND CHOOSE "yes" or "no" if your article contains data for which you provided the link to raw data, and {statistical script or computer code} %%%
+%\newcommand{\opendata}{yes}
+%\newcommand{\opencode}{yes}
+%%%%%%%%%%%%%%%
+
+
+%%%  [IF ACCEPTED] UNCOMMENT AND SET THE version of the preprint. Replace X by a number   %%%
+%\newcommand{\version}{X}
+%%%%%%%%%%%%%%%%%%
+
+
+%%%  [IF ACCEPTED] UNCOMMENT AND SET THE DATE OF LATEST UPLOAD on the preprint server    %%%
+%\newcommand{\datepub}{ddth Month yyyy}
+%%%%%%%%%%%%%%
+
+
+%%%  [IF ACCEPTED] UNCOMMENT AND SET THE RECOMMENDER(s) NAME(s)  %%%
+%\newcommand{\recommender}{FirstName FamilyName}
+%%%%%%%%%%%%%%%%%
+
+%%%  [IF ACCEPTED] UNCOMMENT AND SET THE DOI of the RECOMMENDATION  %%%
+%\newcommand{\DOIrecommendation}{xxx/xxx}
+%%% for example 10.24072/pci.mcb.100003 %%%
+
+
+%%%  [IF ACCEPTED] UNCOMMENT AND SET THE REVIEWERS' NAMES IF KNOWN and/or X anonymous reviewers  %%%
+%\newcommand{\reviewers}{FirstName FamilyName and two anonymous reviewer}
+%%%%%%%%%%%%%%%
+
+
+%%%   [IF ACCEPTED] UNCOMMENT AND SET THE 'CITE AS' OF YOUR PREPRINT. paste the line we sent you by Email (XXX the "cite as") in place of the xxx  %%%
+%\newcommand{\citeas}{xxx}
+%%%%%%%%%%%%%%%%%
+
+\input{preambule.tex}
+
+\usepackage{gensymb}
+\usepackage{tabularx}
+
+\begin{document}
+\beginingpreprint
+
+%%%  [IF ACCEPTED] COMMENT linenumbers  %%%
+\linenumbers
+%%%%%%%%%%%%%%%%%%
+
+%%%  TEXT OF THE PREPRINT  %%%
+% use \emph{} for italics and \parencite{} or \textcite to cite a reference and \ref{XX} to cite the \label{XX}
+% use \\ and a blank line to mark the end of paragraph and starting of a new one
+
+\section*{\centering Introduction}
+
+The development of radiocarbon dating \parencite{Libby1949} revolutionized the study of the past, with its applications in archaeology, geology, paleobiology and paleoclimatology \parencite{Taylor1995,BronkRamsey2008}. As the technique became a standard in research, the accumulation of dated samples leaded to the study of the abundance of these samples through time to address diverse questions regarding environmental processes \parencite[\emph{e.g.} changes in sea level, forest fire frequency or fluvial activity;][]{Geyh1980, Pierce2004, Thorndycraft2006} or the study of population size change in humans and other species \parencite[\emph{e.g.}][]{Rick1987,Broughton2018}.
+%Some assumptions are made regarding the obtention of the samples (independent, free of biases, etc) and the process studied. Other factors than demography can affect the amount of archaeological samples \parencite[e.g. sampling biases, taphonomic loss; see][]{Rick1987,Williams2012} which might invalidate such assumptions. However, the study of these changes in abundance has other applications, such as XXXXXXX \parencite{Crema2022}.
+There is an increasing interest in the analysis of the abundance of radiocarbon dates, which has been enhanced in the last few years with the availability of large \textsuperscript{14}C databases \parencite[e.g.][]{Chaput2016} and the development of new statistical methods \parencite[reviewed in][]{Crema2022}.
+\\
+
+Until very recently, the analysis of the abundance of radiocarbon dates was based mostly on the so-called ``sum of probability distributions'' (SPD). The SPD is obtained through the aggregation of the posterior distributions for the calibrated age of each sample in the data. However, the interpretation of the SPD suffer from some problems. First of all, it lacks a proper definition of what it actually represents. Some authors have discussed the meaning of such sums of probabilities without providing a formal mathematical definition \parencite[\emph{e.g.}][]{Carleton2021,Crema2022}. In spite of this, it is regarded as informative about the changes in abundance of radiocarbon dates through time. However, the lack of a formal model, hampers the exploitation of this intuition as there is no measure of the significance and uncertainty of the inference. For instance, some fluctuations in the SPD can reflect periods of complex uncertainty in the age calibration rather than changes in the abundance of radiocarbon dates (REF).
+\\
+
+In the last few years significant progress has been done by the introductions of model-based methods \parencite[reviewed by][]{Crema2022}. This has open a new world of possibilities for the analysis of the abundance of radiocarbon dates as this allows to test models, make model comparisons and estimate the parameters of those models. These new approaches, however, still rely heavily on the SPD or a probabilistic interpretation of it. The radiocarbon dates are modeled as independent samples taken from a probability distribution, which authors expect to have a similar shape as the normalized SPD. Such model is used either to generate pseudo-observed data or as the inference model \parencite{Porcic2020, Carleton2021b, Crema2021b, Timpson2020}. This interpretation of the SPD as a probability distribution neglects the fundamental nature of the radiocarbon data, which is count data. The number of samples (total or within a period), is given by the process; it is not fixed by the experiment or the researcher. As such, models that consider a fixed number of samples do not fully account for the uncertainty of the process.
+\\
+ 
+% It is worth noting that \textcite{Carleton2021b} proposes an inference model for count `data'; however, it is not directly applied to the observed counts but to simulated counts based on a parametric bootstrap that uses the SPD as the model mentioned above. % REPESCAR PARA LA DISCUSION: Also, the parameters of that inference model, based on a negative binomial, do not have a natural interpretation to the studied process.
+
+In fact, an interpretation of the SPD as the number of samples from each year is more natural and useful. Let us consider the meaning of the SPD value at a single year. Each sample from the dated archaeological record has a probability for being `sampled' that year (a number of them can have a probability close to zero). Therefore, each of the samples that really are from that year can be considered `successes', and the samples from other years as `failures', from independent binomial trials. The sum of those successes follows a Poisson-binomial distribution, whose expected value is the sum of the probabilities of each trial (\emph{i.e.}\ the value of the SPD for that year). This reasoning provides us with the intuition that the SPD somehow quantifies the expected number of samples that each year is contributing to the total set of samples; and that the analysis of radiocarbon abundance data should focus in modeling the number of samples at each year. However, the mentioned Poisson-binomial model does not provide a solution, because SPD values from different years are not independent.
+\\
+
+This work argues that progress in the analysis of the abundance or radiocarbon data requires to dismiss the use of the SPD for statistical inference. A new model is proposed that describes the expected number of samples per year, taking into account calibration uncertainly. The parameters of the model have a natural interpretation about the studied process. The model is implemented under the approximate Bayesian computation framework and its application to pseudo-observed data explores the differences respect to the previous models. A published dataset of archaeological radiocarbon dates from Britain and Ireland \parencite{Bevan2017b} is reanalyzed as an example of application. Most applications of these approach (including the example data) are in the context of archaeological demographic inference and the rest of the article will focus on that application of the model.
+%is only valid if we consider a single year. A single sample cannot have different ages, so several years cannot be modeled with independent Poisson binomial distributions. 
+\\
+
+%In addition, computational approaches based on summary statistics of the data (\emph{i.e.} approximate Bayesian computation) use the SPD values at each year as such summaries \parencite[e.g.][]{Porcic2020}.
+
+
+%There are, however, important limitations to this approach. For instance, \textcite{Williams2012} list five major challenges: (i) presence of biases associated to sampling within an archaeological site, (ii) limited number of samples available, (iii) influence of the calibration curve shape, that can create artificial concentration or overdispersion of dates, (iv) bias due to taphonomic loss and (v) the need to contrast results with independent data. 
+
+%Demographic inference from radiocarbon dates would benefit from a model-based statistical framework that could offer solutions to some of these problems. A probabilistic model of the data can allow incorporating processes that influence the data such as variation of atmospheric \textsuperscript{14}C through time (i.e. calibration) or the taphonomic loss. It would also allow to quantify uncertainty of estimates for small sample sizes and offer model-test tools that could be used to test specific hypothesis based on independent data.  
+
+%Unfortunately, the application of model-based inference from radiocarbon data is hindered by the fact that \emph{dates are not data}. Radiocarbon dating of an item is typically reported a single age value and an uncertainty quantification of that value (standard deviation). However, the true underlying data is the measure of the proportion of \textsuperscript{14}C/\textsuperscript{12}C in the sample, which is then transformed into a ``radiocarbon date'' following some machine-specific calibrations and assuming atmospheric \textsuperscript{14}C constant through time and geography. 
+
+
+%ABC offer a natural way of treating them as transformation of the raw data into summaries is an integral part of the ABC process.
+
+
+\section*{\centering Material and methods}
+
+%The SPD has a central role in most of the current approaches for the analysis of the abundance of archaeological samples through time. Therefore, it is important understand the relationship between the SPD and the models discussed. A first point to clarify is the discrete nature of SPD and the probability distributions that compound it. They are sometimes described as curves of (sum of) probability density (\emph{i.e.}\ continuous distributions), but they are actually discrete distributions with one probability (or sum of probabilities) value for each year. This is a consequence of the granularity of the calibration curves, whose level of resolution is one year (at least for the periods of interest in this work).\\
+
+\subsection*{A mathematical model for the dated archaeological record}
+
+\subsubsection*{A model for the expected number of samples}
+
+
+
+In the proposed model, the (radiocarbon) dated archaeological record is described as a vector $\bm{R}$. Each element $R_t$ of vector $\bm{R}$ contains the number of samples contributed to the dated archaeological record by each year $t$ within a given range of dates $\left[t_{\min},t_{\max}\right]$. Let us consider that at each year $t$ there was a number of items $n_t$ that could potentially become part of the dated archaeological record. These were all the objects of organic origin taking part of, or connected to, human activity and thus would be considered as anthropogenic samples. We assume a model in which each item in $n_t$ become part of $R_t$ with probability $p_t$. This probability $p_t$ describes a complex process, that includes the deposit of the sample, its preservation through time, its discovery by researchers and their decision to radiocarbon-dating it. %This model represents a simplification of the reality: what constitutes a single item in $n_t$ can be ambiguous and the probability of an object to become part of the dated archaeological record will strongly depend on its nature (\emph{i.e.}\ durability of the material or archaeological interest of the object). However, 
+This formulation allows to apply a simple model for the dated archaeological record as a Poisson distribution ($R_t \sim \mathrm{Poisson}(\lambda_t)$, with $\lambda_t=n_tp_t$) providing meaningful parameters. Thus, parameter $\lambda_t$ provides the expected number of samples from year $t$, and vector $\bm{\lambda}$ contains the expected values for $\bm{R}$, which is somehow equivalent to the SPD.
+\\
+
+However, $\bm{R}$ is not directly observable because the true age of each sample in the dated archaeological record is unknown. Radiocarbon dating provides the Conventional Radiocarbon Ages (CRA), also referred to as uncalibrated dates. The CRA values would correspond to the true dates if the environment \textsuperscript{14}C/\textsuperscript{12}C proportions were constant through time and geography and equal to that of the atmosphere in 1950, and if the true \textsuperscript{14}C half-life was \citeauthor{Libby1949}'s \parencite*{Libby1949} estimate of 5730 years \parencite{BronkRamsey2008}. In reality, these assumptions do not hold. Thus, data from the dated archaeological record has the form of vector $\bm{R'}$, which contains the number of samples, $R'_u$, dated at uncalibrated date $u$ within a range $\left[u_{\mathrm{min}},u_{\mathrm{max}}\right]$. The relationship between $\bm{R}$ and $\bm{R'}$ is given by the calibration curve, as in well established Bayesian analysis of radiocarbon dates \parencite{BronkRamsey2008}. Assuming that radiocarbon dating uncertainly can be modelled with a normal distribution, the radiocarbon age $u$ of a sample of age $t$ is modelled as $u \sim \mathcal{N}\left(u_{\mathrm{c},t},\sqrt{e_{\mathrm{c},t}^2+e_{\mathrm{CRA}}^2}\right)$, where $u_{\mathrm{c},t}$ and $e_{\mathrm{c},t}$ are the values of the calibration curve for time $t$ and $e_{\mathrm{CRA}}$ is the measurement error in the CRA for that sample. Using this normal distribution it is possible to model the observed uncalibrated dates ($\bm{R'}$) from the expected number of samples contributed by each `calibrated' year ($\bm{\lambda}$).
+\\
+
+% Calibration curves can be used to transform an uncalibrated date into a probability distribution for calibrated dates. Aggregating all these probability distributions obtained from $\bm{R'}$ we can obtain the so-called Sum of Probability Distributions (SPD). The SPD is interpreted as being informative about the abundances in $\bm{R}$, but there is no formally established correspondence between SPD and $\bm{R}$: $\bm{R}$ cannot be obtained from $\bm{R'}$. In contrast, it is straightforward to simulate $\bm{R'}$ from $\bm{R}$ using the calibration curves \parencite[][; see below]{Shennan2013}.
+
+\subsubsection*{Changes through time of the dated archaeological record}
+
+The model for the abundance of the dated archaeological record as described above is determined by the set of parameters $\lambda_t$ in $\bm{\lambda}$. In most cases, periods of hundreds if not thousands of years will be analyzed, which make models with a large number of parameters (one $\lambda$ per year). This is impractical because large amounts of data would be necessary to fit that many parameters and there would be a very likely risk of over-fitting the model. Instead, additional models can be used to determine the change $\lambda$ through time. In this work four models are explored for this. The first two are the exponential model ($\lambda_t = \lambda_0 e^{-rt}$) and the logistic model ($\lambda_t = \frac{k\lambda_0}{\lambda_0+(k-\lambda_0)e^{-rt}}$). These are simple models often associated to demographic processes \parencite[\emph{e.g.}][]{Bevan2017a}. For a exclusively demographic interpretation of the dated archaeological record, the parameters of these models represent the initial population size ($N_0 = C \lambda_0$), the carrying capacity ($K = C k$) and the growth rate ($r$), with $C$ being an unknown constant of proportionality.
+\\
+
+Noting the limitations of using simple models, \textcite{Brown2017} proposed a dynamic model in which an exponential growth rate changes through time depending on the population size and a covariate based on climate (temperature deviation from the optimum). As our second model, we consider a simplification of that dynamic model:
+$\lambda_t = \left\{
+    \begin{array}{lr}
+        \lambda_0, & \text{if } t=0\\
+        \lambda_{t-1} e^{\beta_0 - \beta_1\lambda_{t-1}^2 - \beta_2D^2}, & \text{if } t\geq 1
+    \end{array}\right.$, where $\beta_0$ represents the intrinsic growth rate, $\beta_1<0$ limits growth with increasing values of $\lambda$, and $\beta_2<0$ limits growth with increasing departures from the environmental optimum ($D=0$). At the environmental optimum, $K=C\sqrt{\frac{\beta_0}{\beta_1}}$ represents the maximum carrying capacity of the population, and at low population size ($\lambda_{t-1} \rightarrow 0$), $\sqrt{\frac{\beta_0}{\beta_2}}$ represents the maximum environmental deviation from the optimum that the population can tolerate without shrinking in size. In this model, we use as a climatic covariate the deviation, $D$, of the temperature to an optimum value, $d$; \emph{i.e.}\ $D=|T-d|$ \parencite[][considered $d$ to be the average temperature of the period]{Brown2017}. Temperature values were taken from the values inferred from isotopes from an ice core in central Greenland \parencite{Alley2000,Alley2004}. The temperature values were intrapolated for each year of the period as in \textcite{Brown2017}.
+\\
+
+
+However, assuming that a single mathematical function governs the changes in $\lambda_t$ over large periods of time might not be appropriate. Piecewise models can be used to set a different relationship between $\lambda$ and $t$ at different periods. The whole range of time considered $\left[t_{\min}, t_{\max}\right]$ is divided in $m$ periods separated by $m + 1$  time points $t_0, t_1, \dots, t_{m}$ (with $t_0 = t_{\mathrm{min}}$ and $t_{m} = t_{\mathrm{max}}$). Here, we consider a piecewise exponential model defined by $m + 1$ parameters $\lambda_{t_0},\lambda_{t_1},\dots ,\lambda_{t_{m}}$. Within each period $x\in\left[1,m\right]$, $\lambda$ changes exponentially with rate $r_x=\frac{\log\left(\lambda_{t_x}\right)-\log\left(\lambda_{t_{x-1}}\right)}{t_x-t_{x-1}}$. For simplicity, we consider the specific case in which all time intervals are of the same length.
+\\
+
+
+%\subsubsection*{Comparisons between two dated archaeological records}
+
+%In some instances, the samples of the dated archaeological record can be separated into different, non-overlapping categories, such as geographical origin or nature of the materials (\emph{e.g.}\ animal/plant origin, species, \emph{etc.}), allowing to define separate dated archaeological records. For instance, for two categories $\mathrm{w}$ and $\mathrm{b}$ we have $\bm{R} = \bm{R}^{\mathrm{w}} + \bm{R}^{\mathrm{b}}$. In the case that we analyse, we consider dated samples of wheat ($\mathrm{w}$) and barley ($\mathrm{b}$) and we refer to their total as the dated archaeological record of ``cereals'' (but note that there are other cereal samples in the data that are excluded from the analysis for the sake of simplicity). Each dated archaeological record can be modelled with a Poisson distribution: $R^{\mathrm{w}}_t \sim \mathrm{Pois}(\lambda^{\mathrm{w}}_t)$, $R^{\mathrm{b}}_t \sim \mathrm{Pois}(\lambda^{\mathrm{b}}_t)$, and $R_t \sim \mathrm{Pois}(\lambda_t) = \mathrm{Pois}(\lambda^{\mathrm{w}}_t + \lambda^{\mathrm{b}}_t)$. We define $\pi_t=\frac{\lambda^{\mathrm{w}}_t}{\lambda_t}$, which describes the proportion of category $\mathrm{w}$ contributing to the total amount of samples. Our interest here is to understand whether the relationship of the changes of $\lambda^{\mathrm{w}}_t$ and $\lambda^{\mathrm{b}}_t$ with time is determined by some common factors or if their histories are independent. We consider three models for the relationship between dated archaeological records. In the first model, that we call ``independent'', $\lambda^{\mathrm{w}}_t$ and $\lambda^{\mathrm{b}}_t$ values are independent. In the second model, that we call ``interdependent'', parameters $\lambda_t$ and $\pi_t$ determine $\lambda^{\mathrm{w}}_t=\pi_t\lambda_t$ and $\lambda^{\mathrm{b}}_t=(1-\pi_t)\lambda_t$. The third model, that we call ``parallel'', is a special case of the interdependent model in which $\pi_t$ is constant through time. The dependency among parameters in the last two models is obtained through the use of interdependent prior probability distributions (see below). 
+%To address this question we can model the changes in $\lambda_t$ through time with models such as those described in the preceding paragraph; and define a new set of parameters for the proportion of the different contributing categories: . For categories $\mathrm{w}$ and $\mathrm{b}$ following exactly the same history, $\pi^{\mathrm{w}}_t$ is a constant, while variations of $\pi^{\mathrm{w}}_t$ through time represents divergent histories for each category.
+%This approach can also be extended to model more than two categories.
+%\\
+
+\subsection*{Inference using approximate Bayesian computation}
+
+
+
+Approximate Bayesian Computation (ABC) is a statistical approach to make model-based inference without the calculation of likelihoods \parencite[see][for a review]{Sunnaker2013}. ABC is often used for inference under model with analytically intractable likelihoods, which is not our case \parencite[e.g.][]{Crema2021b}. However, it has other advantages such as the fast implementation under different models and priors, which is one of the main reasons for its use in this work (see discussion below). In ABC, the calculation of the likelihood of a model is substituted by the simulation of data under the model. The similarity between the real and simulated data reflects the likelihood of the model. This similarity is typically evaluated by comparing several summary statistics of the data (\emph{e.g.}\ the total number of samples in $\bm{R'}$; see below).  Different algorithms have been developed to make statistical inferences from the comparison of real and simulated summary statistics. Here, we will use ABC \emph{via} Random Forests \parencite[ABCRF;][]{Pudlo2016, Raynal2019}, which uses the eponymous machine learning algorithm to learn the relationship between summary statistics similarity and the model. In the learning step, random forests are grown from a training set constituted by a large number of simulations (100 000 for each model in our analyses) known as the reference table. For each simulation, the reference table contains the parameter values and the summary statistics obtained after the simulation. In order to create the reference table we need thus to set (i) a procedure to choose the parameter values for the simulation, (ii) an algorithm to simulate the data and (iii) summary statistics to describe the data. The application of the ABC approach allows to perform model comparison, in order to select the model with highest posterior probability, and parameter inference (\emph{i.e.}\ obtain parameter estimates and credibility intervals from their posterior probability distribution).
+\\
+
+\subsubsection*{Prior probability distributions}
+
+As in any Bayesian approach, prior probability distributions for models and parameters need to be set. The parameter values used to generate the reference table are sampled from those prior probability distributions. For the logistic model there are three parameters $\lambda_0$, $k$ and $\lambda_\mathrm{f}=\frac{k\lambda_0}{\lambda_0+(k-\lambda_0)e^{-rt_{\max}}}$. The parameters $\lambda_0$ and $\lambda_\mathrm{f}$ were taken from a log-uniform prior distribution in the range $\left[ 0.001,12\right]$, conditional to histories of increasing $\lambda$ ($\lambda_0 < \lambda_\mathrm{f}$). For parameter $k$, values are sampled from a log-uniform distribution in the range $\left[\lambda_\mathrm{f}+0.001,\lambda_\mathrm{f}+12\right]$.
+\\
+
+In the dynamic model there are five parameters: $\lambda_0$, $\beta_0$, $\beta_1$, $\beta_2$ and $d$. Parameter $\lambda_0$ was taken from a log-uniform prior distribution in the range $\left[ 0.001,1\right]$, $\beta$ parameters were taken from a log-uniform prior distribution in the range $\left[ 0.00001,0.01\right]$ and $d$ (the optimal environment) was taken from a prior normal distribution with the average and variance of the estimated temperatures over the period, $\mathcal{N}\left(-30.55\mathrm{\degree C},0.72\right)$ (note that $d$ is expressed as the temperature in Greenland, where ice-core isotopes were studied to estimate past temperature).
+\\
+
+
+
+In the piecewise exponential model there are $m+1$ parameters $\lambda$ ($\lambda_{t_0},\lambda_{t_1},\dots ,\lambda_{t_{m}}$). The value of $m$ is set to divide the analysed total range of ages in periods of approximately 400 years. Thus, for the range 10000 years BP to 500 years BP, $m=24$, when the all data are analysed; and for the range 6000 years BP to 500 years BP, $m=14$, when the cereals subset data are analysed. The value of $\lambda_{t_0}$ is taken from a log-uniform prior distribution in the range $\left[\lambda_{\min},\lambda_{\max}\right]$ and consecutive values $\lambda_{t_x}=\max(\min(\phi\lambda_{t_{x-1}},\lambda_{\max}),\lambda_{\min})$ with $\phi$ taken from a log-uniform distribution in the range $\left[0.1,10\right]$ \parencite[as in][]{Boitard2016}. This way of sampling the evolution of $\lambda$ through time reflects the prior belief that large jumps over a short period of time are unrealistic (this prior prevents changes larger that one order of magnitude for consecutive $\lambda_{t_x}$ values). The minimum and maximum  $\lambda$ values for the whole dataset are $\lambda_{\min}=0.001$ and $\lambda_{\max}=12$, and for the cereals data subset are $\lambda_{\min}=0.001$ and $\lambda_{\max}=2$.
+\\
+
+In the case of the cereal dated archaeological record, data are analysed under the piecewise exponential model, combined with the three above-mentioned models that describe the relationship between dated archaeological records of different categories (independent, interdependent and parallel). For the independent model, there are $m+1$ parameters $\lambda^\mathrm{w}$ and $m+1$ parameters $\lambda^\mathrm{b}$ and the values are sampled for each of the two series independently following the procedure described in the previous paragraph. For the interdependent model, $m+1$ parameters $\lambda$ for the total dated archaeological record are sampled with the procedure described in the previous paragraph, then, $m+1$ parameters $\pi$ are sampled from a uniform distribution in the range $[0,1]$ to obtain the proportion of categories $\lambda^\mathrm{w}$ and $\lambda^\mathrm{b}$ at each time $t_0, t_1, \dots , t_{m}$. The parallel model is a special case of the interdependent model, in which a single $\pi$ value is taken from a uniform distribution in the range $[0,1]$ and the proportion of the two categories does not change through time.
+\\
+
+
+\subsubsection*{Simulation of dated archaeological record}
+
+The simulation of the dated archaeological record requires to set a specific model for the relationship between $\lambda_t$ with time (\emph{e.g.}\ the logistic model) and the values of its parameters (\emph{e.g.}\ $\lambda_0^*$, $r^*$ and $K^*$, for the logistic model; where $^*$ denotes simulation values). These will determine all values in $\bm{\lambda}^*$, which are then used to simulate $\bm{R}^*$ by sampling from Poisson distributions. The uncalibrated date $u^*$ for each sample of know date $t^*$ in $\bm{R}^*$ will be simulated by sampling from a Normal distribution with mean and standard deviation taken from the CRA and error associated to $t^*$ in the appropriate calibration curve \parencite{Shennan2013}. This will result in $\bm{R}'^*$. The simulation process is rather similar to the procedure proposed by \textcite{Shennan2013}. The main difference is that the total number of samples in the simulated dated archaeological record depends on the model, allowing to account for this additional source of stochasticity. Throughout this paper we used the IntCal20 calibration curve \parencite{Reimer2020}.
+\\
+
+\subsubsection*{Summary statistics}
+
+Real and simulated data ($\bm{R}'$ and $\bm{R}'^*$) are summarized by a set of values, called summary statistics, that describe informative features of the data. We use the following summary statistics to describe the dated archaeological record: $T$, the total number of uncalibrated dates; $H_{u_i}$, the number of uncalibrated dates at interval $\left[u_i, u_i-100\right) $, with $u_{i+1}=u_i+100$, \emph{i.e.}\ the values represented in an histogram (\emph{e.g.}\ figure~\ref{fig:data}); m $\Delta H_{u_i}$, the difference between consecutive $H_{u_i}$ and $H_{u_{i+1}}$ values; $Q_x$, the quantile of the empirical distribution of uncalibrated dates with probability $x$ (with $x$ taking values from 0 to 1 by 0.02 increments) for the distribution of uncalibrated dates (first and last values are the the minimum and maximum values); $M$, the mean of uncalibrated dates; and, $\sigma$, the standard deviation of uncalibrated dates.
+\\
+
+In the case of dated archaeological record separated into two different categories, we also use the same summary statistics for each category (\emph{e.g.} $T$, $T^\mathrm{w}$ and $T^\mathrm{b}$, \emph{etc.}) and summary statistics that describe the relationship between them: Pearson, Kendall and Spearman correlation statistics and Pearson, Kendall and Spearman covariance statistics, between $\bm{H}^\mathrm{w}$ and $\bm{H}^\mathrm{b}$, between $\bm{\Delta H}^\mathrm{w}$ and $\bm{\Delta H}^\mathrm{b}$; and between $\bm{Q}^\mathrm{w}$ and $\bm{Q}^\mathrm{b}$.
+\\
+
+In the case of real data, dates belonging to the same archaeological site are given a lower weight for the calculation of all these statistics. This is done to compensate biases caused due to large variance in sample size among sites that could reflect, for instance, differences in the funding resources or research questions of the teams working on them rather than the abundance of materials. These weights are calculated by using the binning procedure proposed by \textcite{Shennan2013}. The weight for each uncalibrated date is the inverse of the number of dates within the bin. For instance, all the dates within a bin count as a single sample in $T$. Here we have used a binning range of 100 years.
+\\
+
+\subsection*{Implementation and evaluation of the method}
+
+All the calculations presented in this work were done in R \parencite{R2021} with scripts \parencite[available in][]{Navascues2023} that use: package {extraDistr} \parencite{Wolodzko2020} to sample from prior distributions; package {rcarbon} \parencite{Crema2021a} to simulate CRA; packages {Hmisc} \parencite{Harrell2022}, {moments} \parencite{Komsta2022}, {weights} \parencite{Pasek2021} and {zoo} \parencite{Zeileis2005} to calculate summary statistics; and package {abcrf} \parencite{Marin2022} to perform ABC analyses. Simulations are run in parallel using  {doParallel} \parencite{Microsoft2022a}, {doSNOW} \parencite{Microsoft2022b} and {doRNG} \parencite{Gaujoux2023}.
+\\
+
+The performance of the method and the relevance to the data is evaluated in two ways. First, the power and error of model choice and parameter estimation is evaluated on simulated data under the inference models. This is done exploiting the properties of the random forest algorithm. Random forests are a collection of decision trees that are grown from random subsets of the training data (the reference table in the case of ABC), in a processed called bootstrap aggregating or ``bagging''. Because of this, for each simulation in the reference table there is always a subsets of trees in the random forest that have been grown without the information of that simulation. That subset of trees can be used to make inferences for that simulation, which are called the ``out-of-bag'' predictions. The true values and the out-of-bag predictions can be compared to estimate the error of the method, without the need of an additional testing set. We use these out-of-bag error to evaluate the performance of the approach and provide confusion matrices for model choice evaluation and mean squared error for parameter inference evaluation.
+\\
+
+The second element evaluated is the goodness-of-fit of the model to the observed data. The model choice algorithms can identify the model that best explains the data among the models considered. However, it might be the case that all the considered models are bad at explaining your data; that is, they are unable to generate the similar patterns to the ones observed in the data. In that case, the selected model is unlikely to give any relevant information. In order to verify that this is not the case in the analysis, we visualise the variability of patters produce by the different models using Principal Component Analysis (PCA) to the summary statistics in the reference table and project the observed data set into the PC space. The overlapping of the observed data with the simulated data confirms that the proposed models are able to reproduce the observed patterns.
+\\
+
+\subsection*{Case study: archaeological radiocarbon dates from Britain and Ireland}
+
+In order to illustrate the methods developed in this work we reanalyse data of archaeological radiocarbon dates from Britain and Ireland \parencite{Bevan2017b}. This data base comprises 30516 radiocarbon dates from 200 to 9580 uncalibrated years BP from Ireland (7797 entries), Scotland (6401 entries), North-West England and Wales (5333 entries), and South-East England (10985 entries). In more than three quarters of the entries, the taxonomic origin of the material is identified. The taxonomic level of this identification is heterogeneous across the data: sometimes identification is at species level but often it is only at genus or higher levels. Among the taxon identified, there are several food sources, such as as wheat (\emph{Triticum}, 678 entries) and barley (\emph{Hordeum}, 1102 entries). These two species are the focus of some of our analyses.
+\\
+
+Our work is not intended as a thorough reanalysis of this dataset but as an illustration of the potential of the proposed model and method. We therefore focus on a few of the questions discussed by \textcite{Bevan2017a} trying to provide a more quantitative assessment of the significance and uncertainty of the results. Specifically, we showcase how to apply our approach to (i) identify the model that better describes the abundance of the dated archaeological record, (ii) test the influence of an environmental variable on the dated archaeological record, (iii) identify the periods with a significant rate of change, and (iv) determine the interdependency of changes of abundance among some food sources such as cereals.
+\\
+
+
+\section*{\centering Results}
+
+\subsection*{Use of summary statistics in ABC}
+
+The performance of three separate sets of summary statistics was evaluated. One set of summary statistics consists of the values of the SPD for each year. The other two sets are based on counts of uncalibrated dates: one set is the counts per year and in the other set the data is further summarize (\emph{e.g.}\ counts per decade, etc, see Methods). Summary statistics based on the counts of uncalibrated dates are around 270 times faster to calculate. The accuracy of the inferences is very high with any of the set of summary statistics (figure~\ref{fig:summary_stats}), in particular using the SPD or a set of summary statistics based on the counts of uncalibrated dates has
+
+and there is virtually no gain
+
+
+\begin{figure}[tbh]
+\center\includegraphics[width=6cm]{../../results/method_evaluation/OOB_p_spd.pdf} \includegraphics[width=6cm]{../../results/method_evaluation/OOB_p_hist.pdf} \includegraphics[width=6cm]{../../results/method_evaluation/OOB_p_hist2.pdf}
+\caption{\textbf{XXXXXXXXXX.} (a) SPD (b) hist1 (c) hist2.}
+\label{fig:summary_stats}
+\end{figure}
+
+
+
+\subsection*{Modeling frequencies \emph{versus} modeling counts}
+
+\begin{figure}[tbh]
+\center\includegraphics[width=6cm]{../../results/method_evaluation/OOB_lambda_rate.pdf} \includegraphics[width=6cm]{../../results/method_evaluation/OOB_lambda_0.pdf} \includegraphics[width=6cm]{../../results/method_evaluation/OOB_p_rate.pdf}
+\includegraphics[width=6cm]{../../results/method_evaluation/OOB_p_0.pdf}
+\caption{\textbf{XXXXXXXXXX.} (a) SPD (b) hist1 (c) hist2.}
+\label{fig:summary_stats}
+\end{figure}
+
+
+\subsection*{Analysis of archaeological radiocarbon dates from Britain and Ireland}
+
+% (i) identify the model that better describes the abundance of the dated archaeological record, (ii) test the influence of an environmental variable on the dated archaeological record,
+
+In order to explain the changes in abundance of radiocarbon samples through time in the dated archaeological record from Britain and Ireland three models are proposed in this work: (i) the logistic model, that represent a simple model often associated to demography; (ii) the dynamic model, a model also based on a demographic interpretation that includes an effect of the climate (temperature) in growth rate; and (iii) the piecewise exponential, that represents the idea that the factors determining the abundance of archaeological samples through time and cannot be captured by a simple model over a long stretch of time. The three models seem to be able to reproduce the main patterns found in the data (figure~\ref{fig:PCA_all}). The piecewise exponential model is the one that best explain the data (table~\ref{tab:model_choice}).
+\\
+
+
+The parameter estimates obtained under this model provide values of $\bm{\lambda}$ that follow closely the trajectory of the SPD curve (figure~\ref{fig:piecewise_results}). 
+\\
+
+
+
+
+% (iii) identify the periods with a significant rate of change
+
+
+ %(iv) determine the interdependency of changes of abundance among some food sources such as cereals.
+
+
+
+
+\begin{table}[tbh]
+\caption{\textbf{Model choice results}}
+\label{tab:model_choice}
+\small
+\begin{tabularx}{0.95\textwidth}{>{\raggedright}X l r r l}
+\hline
+model comparison & chosen model & posterior probability & Bayes factor & strength of evidence\textsuperscript{a} \\
+\hline\hline
+%dynamic \emph{vs.} logistic   & dynamic   & $0.524$ &   $1.10$ & barely worth mentioning \\
+%dynamic \emph{vs.} piecewise  & piecewise & $0.968$ &  $29.90$ & strong      \\
+%logistic \emph{vs.} piecewise & piecewise & $0.995$ & $198.20$ & decisive    \\
+logistic, dynamic and piecewise & piecewise & $0.942$ &  $31.82$ & very strong \\
+%\hline\hline
+%independent    \emph{vs.} parallel    & independent    & $0.969$ & $31.15$ & strong \\
+%interdependent \emph{vs.} parallel    & interdependent & $0.972$ & $35.08$ & very strong \\
+%interdependent \emph{vs.} independent & interdependent & $0.899$ &  $8.95$ & substantial \\
+%independent, interdependent and parallel & interdependent & $0.898$ & $18.34$ & strong \\
+\hline
+\end{tabularx}\\
+\footnotesize{\textsuperscript{a} following \citeauthor{Jeffreys1961}' scale \parencite*{Jeffreys1961}.}\\
+\end{table}
+
+\begin{figure}[tbh]
+\center\includegraphics[width=12cm]{../../results/piecewise_model_result_lambda.pdf}
+\center\includegraphics[width=12cm]{../../results/piecewise_model_result_rate.pdf}
+\caption{\textbf{Parameter estimates under piecewise exponential model.} (a) Abundance of dated archaeological record through time measured as the expected number of dated archaeological samples per year ($\lambda$). Solid blue line indicate the point estimate ($\hat\lambda$) and dashed lines indicate 95\% credibility interval. The Sum of Probability Densities (grey line) of the data has been plotted for reference. (b) Rate of change in the abundance of dated archaeological record through time ($r$). Solid blue line indicate the point estimate ($\hat{r}$) and dotted lines indicate 95\%CI. Periods in which the 95\%CI for $r$ does not include zero (horizontal grey line) are marked with '\textbf{*}´.}
+\label{fig:piecewise_results}
+\end{figure}
+
+
+
+
+
+
+%\begin{figure}[tbh]
+%\center\includegraphics[width=12cm]{../../results/Cereals_interdependent_model_result_lambda.pdf}
+%\center\includegraphics[width=12cm]{../../results/Cereals_interdependent_model_result_pi.pdf}
+%\caption{\textbf{Parameter estimates under the interdependent model for cereals (\textit{Hordeum}/\emph{Triticum}).} (a) Lambda. (b) Pi.}
+%\label{fig:cereals_interdependent_results}
+%\end{figure}
+
+
+
+\subsection*{Performance of ABC for the analysis of dated archaeological record}
+
+As stated in the previous paragraph, the The use of random forest for ABC
+
+The examination of out-of-bag estimates reveals a good performance of the ABC approach for the models considered. Model selection shows very low error rates in general (table~\ref{tab:confusion_matrix}). The different models describing the changes of $\lambda$ with time (logistic, dynamic and piecewise exponential) can be distinguished with a prior error rate of $0.016$. The models describing the relationship of two dated archaeological records (independent, interdependent, parallel) are a bit more difficult to distinguish, with a prior error rate of $0.092$. This could be due to the similarities between these models, which in essence are the same model with different conditional prior probability distributions for its parameters.
+\\
+
+The ABC approach also seems to provide a good performance for parameter estimation (figure~\ref{fig:OOB}). The inference of abundance of archaeological samples through time ($\lambda$) is very accurate in the piecewise exponential model. Precision decreases with lower values of $\lambda$, which is expected since the estimation is based on a lower number of samples around the period. The estimation of the rate of change, $r$, is also quite accurate but has lower precision. For the models for two dated archaeological records, the parameter $\pi$ is also estimated accurately but with a somehow low precision.
+\\
+
+
+
+\section*{\centering Discussion}
+
+
+
+
+ABC is widely used in the analysis of population genetic data to make inferences on demography. Assuming that the dated archaeological record is informative about the same demographic, both types of data could be analysed together using ABC. For instance, genetic data from \parencite[][]{Patterson2022} and the radiocarbon data used here \parencite{Bevan2017a} could be analysed together to study the demography during the Neolithic transition in Britain. 
+\\
+
+
+Many archaeological samples are not (or cannot be) radiocarbon dated. However, other approaches are sometimes used (numismatic dating, context) to estimate their age. If an appropriate mathematical description of the uncertainty of the dating is provided, it might be possible to analyse such data together with radiocarbon dated samples.
+\\
+
+
+Demographic inference from radiocarbon data assumes that there is a relationship between the magnitude of the population size ($N_t$) and the magnitude of dated archaeological samples at a given time $t$. Mathematically we can express this as $\lambda_t \propto N_t$. This parameter $\lambda$ describes a complex reality: the reduction of the total amount of carbon-based items in the human settlement (wood, tools, food, humans themselves, etc.)\ to the amount that is deposited, then preserved though time, then excavated/discovered and finally dated. It has been acknowledged that each of these steps can be the source of biases: the amount of fire used (thus charcoal deposit) changes with climate, younger samples are more likely to be preserved than older ones, archaeological research questions drive which sites/periods are studied and which samples are dated \parencite{Rick1987,Williams2012}. However, it is assumed that these biases do not distort the general patterns and some attenuation procedures have also been proposed \textcite[\emph{e.g.}\ binning][]{Shennan2013}.
+\\
+
+
+
+% TAPHONOMIC BIAS
+% If we consider the possibility of taphonomic bias, only a proportion of those items will perdure into the present. The probability $p$ that any item remains in the archaeological deposit at present depends on time $p_t = e^{-\lambda t}$ (older items are more likely to disappear). The final number of items contributed to the archaeological record from year $t$ can be modeled with a Binomial distribution $n'_t \sim B(n_t,p_t)$
+
+
+
+
+
+\section*{\centering Acknowledgements}
+
+The idea of this work comes from a discussion with Mattias Jakobsson about the possibility of combining of the demographic inference used in archaeology with the approaches used in population genetics. 
+
+\section*{\centering Funding}
+
+This project has received funding from the European Union’s Horizon 2020 research and innovation programme under the Marie Skłodowska-Curie grant agreement No 791695 (TimeAdapt).
+
+\section*{\centering Conflict of interest disclosure}
+
+The authors of this article declare that they have no financial conflict of interest with the content of this article.
+% Miguel de Navascués is recommender for PCI Evolutionary Biology.
+
+% \section*{\centering Data, script and code availability}
+
+% Data are available online: DOI of the webpage hosting the data (eg \url{https://doi.org/10.24072/pcjournal.125} or other link)
+
+\section*{\centering Supplementary information availability}
+
+Scripts to reproduce the analyses presented here are available at Zenodo \parencite{Navascues2023}. Data used in this work are from previous publications and were made available by \textcite{Alley2004} and \textcite{Bevan2017b}.
+
+
+\titleformat*{\section}{\bfseries\Large\centering}
+
+%%%%%% if they exist, DOIs are required %%%%%%%
+\printbibliography[notcategory=ignore]
+
+
+
+\newpage
+\section*{\centering Appendix}
+
+\begin{table}[h]
+\caption{\textbf{Notation\textsuperscript{a}}}
+\label{tab:notation}
+\small
+\begin{tabularx}{\textwidth}{lX}
+\hline
+& meaning \\
+\hline\hline
+CRA & conventional radiocarbon age\\
+$n_t$ & number of objects in year $t$ that can potentially become a sample in the dated archaeological record\\
+$\mathcal{N}$ & normal or Gaussian distribution\\
+$p_t$ & probability of an object to become a sample in the dated archaeological record at year $t$\\
+$\bm{R}$ & vector of number of samples in the dated archaeological record for each year between $t_\mathrm{min}$ and $t_\mathrm{max}$\\
+$R_t$ & number of samples in the dated archaeological record originating from year $t$, an element of vector $\bm{R}$\\
+$\bm{R'}$ & vector of number of samples in the dated archaeological record for each uncalibrated year between $u_\mathrm{min}$ and $u_\mathrm{max}$\\
+$R'_u$ & number of samples in the dated archaeological record with radiocarbon date $u$, an element of vector $\bm{R'}$\\
+$t$ & time in years (calibrated)\\
+$T$ & (weighted) total number of samples in the dated archaeological record\\
+$u$ & uncalibrated radiocarbon year\\
+$\bm{\lambda}$ & vector of expected number of samples in the dated archaeological record for each year between $t_\mathrm{min}$ and $t_\mathrm{max}$\\
+$\lambda_t$ & expected number of samples in the dated archaeological record originating from year $t$, an element of vector $\bm{\lambda}$\\
+\hline
+\end{tabularx}\\
+\footnotesize{\textsuperscript{a} We follow the convention of marking vectors with bold font.}\\\end{table}
+
+
+
+%\begin{table}[h]
+%\caption{\textbf{Observed summary statistics (selection\textsuperscript{a})}}
+%\label{tab:sumstats}
+%\begin{tabular}{lrrrr}
+%\hline
+%statistic & all data & cereals & wheat & barley \\
+%\hline\hline
+%$T$       & 16056   & & &\\
+%$Q_0$     & 200     & & &\\
+%$Q_{0.1}$ & 955     & & &\\
+%$Q_{0.2}$ & 1340    & & &\\
+%$Q_{0.3}$ & 1840    & & &\\
+%$Q_{0.4}$ & 2250    & & &\\
+%$Q_{0.5}$ & 2820    & & &\\
+%$Q_{0.6}$ & 3230    & & &\\
+%$Q_{0.7}$ & 3600.5  & & &\\
+%$Q_{0.8}$ & 4050    & & &\\
+%$Q_{0.9}$ & 4814.5  & & &\\
+%$Q_1$     & 9580    & & &\\
+%$M$       & 2869.59 & & &\\
+%$\sigma$  & 1626.22 & & &\\
+%\hline
+%\end{tabular}
+%\\\footnotesize{\textsuperscript{a} See histograms in figures~\ref{fig:data}a and XXX for a visual presentation of statistics $H_{u_i}$ and $\Delta H_{u_i}$. Only 11 quantiles (from 101 calculated) presented in this table.}\\
+%\end{table}
+
+
+
+\begin{figure}
+\center\includegraphics[width=12cm]{../../results/hist.pdf}
+%\center\includegraphics[width=12cm]{../../results/spd.pdf}
+\caption{\textbf{Conventional radiocarbon ages composing the dated archaeological record from Britain and Ireland \parencite{Bevan2017a}.} Histogram with number of samples in the dated archaeological record in bins of 100 (uncalibrated) years.}
+\label{fig:data}
+\end{figure}
+
+
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=12cm]{../../results/SPD_plus_lambda_models.pdf}
+\end{center}
+\caption{\textbf{Relationship between $\lambda$ and time under the three models considered.} Based on the parameter point estimates for each model. The Sum of Probability Densities (SPD) of the data is shown for reference.}
+\label{fig:skylines}
+\end{figure}
+
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=5cm]{../../results/PCA_PC1_PC2.pdf}\includegraphics[width=5cm]{../../results/PCA_PC3_PC4.pdf}\includegraphics[width=5cm]{../../results/PCA_PC5_PC6.pdf}
+\end{center}
+\caption{\textbf{PCA for goodness-of-fit evaluation.} PC values from 2000 randomly selected simulations are plotted for each model. The projection of the observed summary statistics is represented by an asterisk. The first six principal components capture 99.24\% of the variance in the data and are presented by consecutive pairs in panels (a), (b) and (c).}
+\label{fig:PCA_all}
+\end{figure}
+
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[width=5cm]{../../results/Cereals_PCA_PC1_PC2.pdf}\includegraphics[width=5cm]{../../results/Cereals_PCA_PC3_PC4.pdf}\includegraphics[width=5cm]{../../results/Cereals_PCA_PC5_PC6.pdf}
+%\end{center}
+%\caption{\textbf{PCA for goodness-of-fit evaluation, cereals.} PC values from 2000 randomly selected simulations are plotted for each model. The projection of the observed summary statistics is represented by an asterisk. The first six principal components capture 99.99\% of the variance in the data and are presented by consecutive pairs in panels (a), (b) and (c).}
+%\label{fig:PCA_cereals}
+%\end{figure}
+
+
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[width=5cm]{../../results/posterior_lambda_0_logistic.pdf}\includegraphics[width=5cm]{../../results/posterior_K_logistic.pdf}\includegraphics[width=5cm]{../../results/posterior_r_logistic.pdf}
+%\end{center}
+%\caption{\textbf{Posterior distribution for parameters of logistic model.}}
+%\label{fig:posterior_logistic}
+%\end{figure}
+
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[width=5cm]{../../results/posterior_lambda_0_dynamic.pdf}\includegraphics[width=5cm]{../../results/posterior_beta_0_dynamic.pdf}\includegraphics[width=5cm]{../../results/posterior_beta_1_dynamic.pdf}
+%\includegraphics[width=5cm]{../../results/posterior_beta_2_dynamic.pdf}\includegraphics[width=5cm]{../../results/posterior_d_dynamic.pdf}
+%\end{center}
+%\caption{\textbf{Posterior distribution for parameters of dynamic model.}}
+%\label{fig:posterior_dynamic}
+%\end{figure}
+
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=5cm]{../../results/posterior_lambda_10000_piecewise.pdf}\includegraphics[width=5cm]{../../results/posterior_lambda_5250_piecewise.pdf}\includegraphics[width=5cm]{../../results/posterior_lambda_500_piecewise.pdf}
+\includegraphics[width=5cm]{../../results/posterior_r_10000_9604_piecewise.pdf}\includegraphics[width=5cm]{../../results/posterior_r_4854_4458_piecewise.pdf}\includegraphics[width=5cm]{../../results/posterior_r_896_500_piecewise.pdf}
+\end{center}
+\caption{\textbf{Posterior distribution for parameters of the piecewise exponential model.} For the sake of simplicity, only a selection of parameters is presented. Sub-indices for $\lambda$ and $r$ parameters indicate the year or year interval (BP, calibrated time).}
+\label{fig:posterior_dynamic}
+\end{figure}
+
+
+
+\begin{table}[tbh]
+\caption{\textbf{Confusion matrix}}
+\label{tab:confusion_matrix}
+\small
+\begin{tabular}{lrrrr}
+\hline
+true model &         & prediction &           & error rate \\
+\hline\hline
+           & dynamic & logistic   & piecewise &  \\
+\hline
+dynamic    &    \cellcolor{pciblue!92.640!white!100}{$92640$} &        \cellcolor{pciblue!0.768!white!100}{$768$} &      \cellcolor{pciblue!1.388!white!100}{$1388$} &      $0.023$ \\
+logistic   &      \cellcolor{pciblue!0.044!white!100}{$44$} &      \cellcolor{pciblue!99.292!white!100}{$99292$} &       \cellcolor{pciblue!0.664!white!100}{$664$} &      $0.007$ \\
+piecewise  &     \cellcolor{pciblue!0.545!white!100}{$545$} &       \cellcolor{pciblue!1.423!white!100}{$1423$} &     \cellcolor{pciblue!98.032!white!100}{$98032$} &      $0.020$ \\
+\hline%\hline
+%  & independent & interdependent   & parallel &   \\
+%\hline
+%independent    &   \cellcolor{pciblue!91.733!white!100}{$91733$} &        \cellcolor{pciblue!6.601!white!100}{$6601$} &      \cellcolor{pciblue!1.657!white!100}{$1657$} &      $0.083$ \\
+%interdependent   &      \cellcolor{pciblue!2.270!white!100}{$2270$} &      \cellcolor{pciblue!91.567!white!100}{$91567$} &       \cellcolor{pciblue!5.674!white!100}{$5674$} &      $0.080$ \\
+%parallel  &     \cellcolor{pciblue!1.449!white!100}{$1449$} &       \cellcolor{pciblue!9.507!white!100}{$9507$} &     \cellcolor{pciblue!84.856!white!100}{$84856$} &      $0.114$ \\
+%\hline
+\end{tabular}
+\end{table}
+
+
+
+\begin{figure}[tbh]
+\center\includegraphics[width=7cm]{../../results/piecewise_OOB_lambda.pdf}\includegraphics[width=7cm]{../../results/piecewise_OOB_rate.pdf}
+%\includegraphics[width=6cm]{../../results/cereals_OOB_pi.pdf}
+\caption{\textbf{Performance of parameter estimation evaluated using out-of-bag estimates.} For each simulation of the reference table of the piecewise exponential model the out-of-bag estimate is compared with the true simulated value of the parameter. The intensity of the color indicates the number of simulations. For reference, a dashed diagonal line indicates the one-to-one relationship. Mean squared error (MSE) and the coefficient of regression (R2) between true values and estimates are reported within each panel. (a) Performance of the estimation of annual expected number of samples, $\lambda_t$ at time $t=5250$ cal.~years BP (piecewise exponential model). (b) Performance of the estimation of exponential rate of change of $\lambda$, $r$ in the period ($4854$--$4458$) cal.~years BP (piecewise exponential model).%(c) Performance of the estimation of the proportion, $\pi$, of two classes of samples (wheat and barley) in the cereals dated archaeological record at time  $t=3250$ cal.~years BP (interdependent model). Note that MSE and R2 are calculated on the logit transformation of the parameter $\pi$.
+}
+\label{fig:OOB}
+\end{figure}
+
+
+
+
+
+
+%\begin{figure}
+%\includegraphics[width=8cm]{../../results/piecewise_model_result_error.pdf}
+%\includegraphics[width=8cm]{../../results/piecewise_model_result_rate_error.pdf}
+%\caption{\textbf{Error.} Piecewise model ($m=78$).}
+%\label{fig:piecewise_error}
+%\end{figure}
+
+
+\end{document}

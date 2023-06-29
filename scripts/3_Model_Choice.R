@@ -46,7 +46,7 @@ if ( !file.exists("results/model_choice_0.rda") ){
 posterior_model_choice
 confusion_matrix
 prediction_error
-K = posterior_model_choice$post.prob / (1-posterior_model_choice$post.prob)
+K = posterior_model_choice$post.prob * (1-nrow(reftable_piecewise)/length(model)) / (1-posterior_model_choice$post.prob) / (nrow(reftable_piecewise) / length(model))
 (K)
 interpret_K(K)
 

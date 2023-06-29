@@ -154,12 +154,12 @@ get_piecewise_exponential_model = function(num_of_periods,lambda_min,lambda_max,
 
 get_piecewise_exponential_model_2_categories = function(num_of_periods,
                                                         lambda_min, lambda_max,
-                                                        model = "independent", # "correlated" "proportional"
+                                                        model = "independent", # "interdependent" "parallel"
                                                         alpha = NULL, beta = NULL, pi = NULL,
                                                         time_range){
   time_of_change = get_time_of_change(num_of_periods, time_range, intervals = "regular")
   
-  if (model == "proportional" & !is.null(pi) ){
+  if (model == "parallel" & !is.null(pi) ){
     lambda_values = get_lambda_values_piecewise_model(num_of_periods + 1, lambda_min, lambda_max)
     growth_rates = get_growth_rates(num_of_periods,log(lambda_values),time_of_change)
     
@@ -168,7 +168,7 @@ get_piecewise_exponential_model_2_categories = function(num_of_periods,
     lambda_values_B = (1 - pi) * lambda_values
     growth_rates_B = get_growth_rates(num_of_periods,log(lambda_values_B),time_of_change)
     
-  } else if (model == "correlated" & !is.null(alpha) & !is.null(beta) ){
+  } else if (model == "interdependent" & !is.null(alpha) & !is.null(beta) ){
     lambda_values = get_lambda_values_piecewise_model(num_of_periods + 1, lambda_min, lambda_max)
     growth_rates = get_growth_rates(num_of_periods,log(lambda_values),time_of_change)
     
@@ -180,10 +180,10 @@ get_piecewise_exponential_model_2_categories = function(num_of_periods,
     growth_rates_B = get_growth_rates(num_of_periods,log(lambda_values_B),time_of_change)
     
   } else {
-    if (model == "proportional" & is.null(pi)){
-      cat("Value for pi is NULL, running model 'independent' instead of 'proportional'\n")
-    } else if (model == "correlated" & ( is.null(alpha) | is.null(beta) )){
-      cat("Value for alpha or beta is NULL, running model 'independent' instead of 'correlated'\n")
+    if (model == "parallel" & is.null(pi)){
+      cat("Value for pi is NULL, running model 'independent' instead of 'parallel'\n")
+    } else if (model == "interdependent" & ( is.null(alpha) | is.null(beta) )){
+      cat("Value for alpha or beta is NULL, running model 'independent' instead of 'interdependent'\n")
     } else if (model != "independent"){
       cat("Undefined model, running model 'independent'\n")
     }
