@@ -5,6 +5,78 @@ require(ggplot2)
 results_directory = "results/method_evaluation"
 dir.create(results_directory)
 
+# MODEL DESCRIPTION
+time_range = c(2450, 2400)
+errors = 10
+lambda_0 = 1
+rate = 0.04
+time_range_CRA = get_time_range_CRA(time_range, error = max(errors))
+lambda_t = get_exponential_lambda_t(lambda_0, rate, time_range)
+
+plot_lambda_model_file = paste0(results_directory, "/plot_lambda_model.pdf")
+if (!file.exists(plot_lambda_model_file)){
+  pdf(file = plot_lambda_model_file, width = 7, height = 4)
+  par(mar=c(4.5, 4.5, 1, 1) + 0.1)
+  plot(seq(time_range[1], time_range[2], -1),
+       lambda_t,
+       xlim = time_range, ylim=c(0,10),
+       ylab = expression(lambda),
+       xlab = "Years BP (calibrated)",
+       type="l", col="grey")
+  points(seq(time_range[1], time_range[2], -1),
+         lambda_t)
+  text(time_range[1],10,"a",cex=1.5)
+  #text(2425,8,expression(bold(lambda)),cex=3)
+  text(2425,8,expression(lambda[italic(t)]*"=e"^0.04*""^italic(t)),cex=2.5)
+  
+  dev.off()  
+}
+
+  
+
+plot_R_file = paste0(results_directory, "/plot_R.pdf")
+if (!file.exists(plot_R_file)){
+  DAR = sim_dates_lambda(lambda_t, time_range)
+  pdf(file = plot_R_file, width = 7, height = 4)
+  par(mar=c(4.5, 4.5, 1, 1) + 0.1)
+  h = hist(DAR,
+           breaks = seq(time_range[1],time_range[2],-1),
+           xlim = time_range,
+           xlab = "Years BP (calibrated)",
+           main=""
+  )
+  text(time_range[1],max(h$counts), "b", cex = 1.5)
+  text(2425, max(h$counts)-1, expression(bold(italic(R))), cex = 2.5)
+  box()
+  dev.off()
+}
+  
+  
+
+plot_Rprime_file = paste0(results_directory, "/plot_Rprime.pdf")
+if (!file.exists(plot_Rprime_file)){
+  DAR_prime = sim_CRA(DAR, calCurves="intcal20", errors)
+  pdf(file = plot_Rprime_file, width = 7, height = 4)
+  par(mar=c(4.5, 4.5, 1, 1) + 0.1)
+  h = hist(DAR_prime$CRA,
+           breaks = seq(time_range_CRA[1],time_range_CRA[2],-1),
+           xlim = time_range,
+           xlab = "Years BP (CRA)",
+           main=""
+  )
+  text(time_range[1],max(h$counts),"c",cex=1.5)
+  text(2425,max(h$counts)-0.5,expression(bold(italic("R'"))),cex=2.5)
+  box()
+  dev.off()
+}
+
+
+  
+  
+
+
+# SPD AS SUMMARY STATISTICS
+
 time_range = c(7000, 5000)
 number_of_replicates = 30 # X
 errors = 30
@@ -136,7 +208,7 @@ if (!file.exists(OOBplot_p_hist2_file)){
     geom_abline(intercept = 0, slope = 1, color = "black",  linetype="dashed") +
     annotate("text", x=0.005, y=-0.005, label= paste("MSE =",MSE),  size=4) +
     annotate("text", x=0.005, y=-0.006, label= bquote(paste(italic("R")^"2"," = ",.(R2))),  size=4) +
-    annotate("text", x=min(param), y=max(param), label= "c",  size=8) +
+    annotate("text", x=min(param), y=max(param), label= "b",  size=8) +
     theme_bw() + theme(panel.border = element_rect(colour = "black", fill=NA), 
                        panel.grid.major = element_blank(),
                        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
