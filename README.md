@@ -31,11 +31,7 @@ DARthABC:
 - weights
 - extraDistr
 
-Example:
-
-- abcrf
-
-Replication of published analyses
+Scripts that apply the moethod to data:
 
 - abcrf
 - doSNOW
