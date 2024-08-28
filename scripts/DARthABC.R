@@ -28,20 +28,69 @@ get_exponential_lambda_t = function(lambda_0, r, time_range){
   lambda_t = c(lambda_0, lambda_0 * exp(r * seq_len(t)))
   return(lambda_t)
 }
-# get exponential model from prior
+
+# get logistic model from prior
+sample_logistic_parameters_from_priors = function(lambda_min, lambda_max, time_range, force=NULL){
+  lambda = exp(runif(2,log(lambda_min),log(lambda_max)))
+  if (!is.null(force)){
+    if (force=="expansion") lambda = sort(lambda)
+    if (force=="decline") lambda = sort(lambda, decreasing = T)
+  }
+  K = max(lambda) + exp(runif(1,log(lambda_min),log(lambda_max)))
+  while (K*lambda[1]/lambda[2]-lambda[1] <= 0 | K-lambda[1] <= 0){
+    lambda = exp(runif(2,log(lambda_min),log(lambda_max)))
+    if (expansion) lambda = sort(lambda)
+    K = max(lambda) + exp(runif(1,log(lambda_min),log(lambda_max)))
+  }
+  r = (log(K-lambda[1]) - log(K*lambda[1]/lambda[2]-lambda[1])) / (time_range[1] - time_range[2])
+  
+  
+  
+  r = (log(lambda[2]) - log(lambda[1])) / (time_range[1] - time_range[2])
+  return(data.frame(lambda_0 = lambda[1],
+                    lambda_f = lambda[2],
+                    K        = K,
+                    rate     = r))
+}
+# get lambda values for each year in the interval (lambda_t)
+get_logistic_lambda_t = function(lambda_0, K, r, time_range){
+  t = (time_range[1] - time_range[2])
+  lambda_t =  c(lambda_0, K*lambda_0 / (lambda_0 + (K - lambda_0)*exp(-r*seq_len(t)) ))
+  return(lambda_t)
+}
+
+
+
+
+
+
+
+
+# get piecewise exponential model from prior
 sample_exponential_piecewise_parameters_from_priors = function(lambda_min, lambda_max,
                                                                time_range,
                                                                num_of_periods,
-                                                               intervals="dirichlet"){
+                                                               intervals="dirichlet",
+                                                               f=10){
 
-  lambda_values = sample_lambda_values_piecewise_model(num_of_periods+1, lambda_min, lambda_max)
-  time_of_change = get_time_of_change(num_of_periods, time_range, intervals = intervals)
+  lambda_values = sample_lambda_values_piecewise_model(num_of_periods+1, lambda_min, lambda_max, f)
+  if (length(intervals)==1){
+      time_of_change = get_time_of_change(num_of_periods, time_range, intervals = intervals)
+  }else if (all(is.numeric(intervals),
+                length(intervals)==num_of_periods+1,
+                intervals[1]==time_range[1],
+                intervals[length(intervals)]==time_range[length(time_range)])){
+    time_of_change = intervals
+  }else{
+    stop("invalid intervals value. Values accepted: 'dirichlet, 'regular' or vector of times of change")
+  }
   growth_rates = get_growth_rates(num_of_periods, log(lambda_values), time_of_change)
   names(lambda_values) = paste0("lambda_",seq_len(num_of_periods+1))
   names(time_of_change) = c("t_0",paste0("t_",seq_len(num_of_periods-1)),"t_f")
   names(growth_rates) = paste0("r_",seq_len(num_of_periods))
   return(data.frame(t(c(lambda_values,time_of_change,growth_rates))))
 }
+
 get_piecewise_exponential_lambda_t = function(lambda_values, time_of_change, growth_rates){
   if ((length(lambda_values)==length(time_of_change)) & length(lambda_values)==(1+length(growth_rates))){
     num_of_periods = length(growth_rates)
@@ -56,11 +105,11 @@ get_piecewise_exponential_lambda_t = function(lambda_values, time_of_change, gro
     stop("invalid input size,must be: length(lambda_values)==length(time_of_change)==1+length(growth_rates)")
   }
 }
-sample_lambda_values_piecewise_model = function(n, lambda_min, lambda_max){
+sample_lambda_values_piecewise_model = function(n, lambda_min, lambda_max, f=10){
   lambda_values = array(NA, n)
   lambda_values[1] = exp(runif(1, log(lambda_min), log(lambda_max)))
   for (i in 2:(n)){
-    alpha = runif(1, log(0.1), log(10))
+    alpha = runif(1, log(1/f), log(f))
     lambda_values[i] = exp(max(min(log(lambda_values[i-1]) + alpha, log(lambda_max)), log(lambda_min)))
   }
   return(lambda_values)
@@ -244,6 +293,123 @@ interpret_K = function(k){
   } else if (k >= 10^2)  { interpretation = paste(interpretation, "decisive")
   }
   print(interpretation)
+}
+
+
+
+
+
+# get piecewise exponential model from prior for 2 categories
+sample_exponential_piecewise_parameters_2_categories = function(lambda_min, lambda_max,
+                                                                time_range,
+                                                                num_of_periods,
+                                                                intervals = "dirichlet",
+                                                                scenario = "independent", # "interdependent" "parallel"
+                                                                alpha = NULL, beta = NULL){ 
+  
+  time_of_change = get_time_of_change(num_of_periods, time_range, intervals = intervals)
+  
+  if ( (scenario == "parallel" | scenario == "interdependent") & !is.null(alpha) & !is.null(beta) ){
+    lambda_values = sample_lambda_values_piecewise_model(num_of_periods + 1, lambda_min, lambda_max)
+    if (scenario == "parallel"){
+      pi = rep(rbeta(1, alpha, beta), num_of_periods + 1) 
+    }else{
+      pi = rbeta(num_of_periods + 1, alpha, beta)
+    }
+    lambda_values_A = pi * lambda_values
+    lambda_values_B = (1 - pi) * lambda_values
+  } else {
+    if ((scenario == "parallel" | scenario == "interdependent") & ( is.null(alpha) | is.null(beta) )){
+      cat("Value for alpha or beta is NULL, running model 'independent' instead'\n")
+    } else if (scenario != "independent"){
+      cat("Undefined model, running model 'independent'\n")
+    }
+    lambda_values_A = sample_lambda_values_piecewise_model(num_of_periods+1, lambda_min, lambda_max)
+    lambda_values_B = sample_lambda_values_piecewise_model(num_of_periods+1, lambda_min, lambda_max)
+    pi = lambda_values_A/(lambda_values_A+lambda_values_B)
+  }
+  growth_rates_A = get_growth_rates(num_of_periods,log(lambda_values_A),time_of_change)
+  growth_rates_B = get_growth_rates(num_of_periods,log(lambda_values_B),time_of_change)
+  
+  return(list(time_of_change=time_of_change,
+              lambda_values_A=lambda_values_A,
+              lambda_values_B=lambda_values_B,
+              pi=pi,
+              growth_rates_A=growth_rates_A,
+              growth_rates_B=growth_rates_B))
+}
+  
+  
+
+  
+
+get_piecewise_exponential_model_2_categories = function(num_of_periods,
+                                                        lambda_min, lambda_max,
+                                                        model = "independent", # "interdependent" "parallel"
+                                                        alpha = NULL, beta = NULL,
+                                                        time_range){
+  time_of_change = get_time_of_change(num_of_periods, time_range, intervals = "regular")
+  
+  if (model == "parallel" & !is.null(pi) ){
+    lambda_values = get_lambda_values_piecewise_model(num_of_periods + 1, lambda_min, lambda_max)
+    growth_rates = get_growth_rates(num_of_periods,log(lambda_values),time_of_change)
+    
+    lambda_values_A = pi * lambda_values
+    growth_rates_A = get_growth_rates(num_of_periods,log(lambda_values_A),time_of_change)
+    lambda_values_B = (1 - pi) * lambda_values
+    growth_rates_B = get_growth_rates(num_of_periods,log(lambda_values_B),time_of_change)
+    
+  } else if (model == "interdependent" & !is.null(alpha) & !is.null(beta) ){
+    lambda_values = get_lambda_values_piecewise_model(num_of_periods + 1, lambda_min, lambda_max)
+    growth_rates = get_growth_rates(num_of_periods,log(lambda_values),time_of_change)
+    
+    pi = rbeta(num_of_periods + 1,alpha,beta)
+    
+    lambda_values_A = pi * lambda_values
+    growth_rates_A = get_growth_rates(num_of_periods,log(lambda_values_A),time_of_change)
+    lambda_values_B = (1 - pi) * lambda_values
+    growth_rates_B = get_growth_rates(num_of_periods,log(lambda_values_B),time_of_change)
+    
+  } else {
+    if (model == "parallel" & is.null(pi)){
+      cat("Value for pi is NULL, running model 'independent' instead of 'parallel'\n")
+    } else if (model == "interdependent" & ( is.null(alpha) | is.null(beta) )){
+      cat("Value for alpha or beta is NULL, running model 'independent' instead of 'interdependent'\n")
+    } else if (model != "independent"){
+      cat("Undefined model, running model 'independent'\n")
+    }
+    
+    lambda_values_A = sample_lambda_values_piecewise_model(num_of_periods+1,lambda_min,lambda_max)
+    growth_rates_A = get_growth_rates(num_of_periods,log(lambda_values_A),time_of_change)
+    
+    lambda_values_B = sample_lambda_values_piecewise_model(num_of_periods+1,lambda_min,lambda_max)
+    growth_rates_B = get_growth_rates(num_of_periods,log(lambda_values_B),time_of_change)
+    
+    pi = lambda_values_A/(lambda_values_A+lambda_values_B)
+    
+  }
+  
+  
+  lambda_t_A = lambda_t_B = numeric()
+  r_t_A = r_t_B = numeric()
+  for (i in 1:num_of_periods){
+    lambda_t_A = c(lambda_t_A,
+                   lambda_values_A[i] * exp(growth_rates_A[i]*seq_len(abs(time_of_change[i+1]-time_of_change[i])) ) )
+    r_t_A = c(r_t_A, rep(growth_rates_A[i],abs(time_of_change[i+1]-time_of_change[i])))
+    lambda_t_B = c(lambda_t_B,
+                   lambda_values_B[i] * exp(growth_rates_B[i]*seq_len(abs(time_of_change[i+1]-time_of_change[i])) ) )
+    r_t_B = c(r_t_B, rep(growth_rates_B[i],abs(time_of_change[i+1]-time_of_change[i])))
+  }
+  
+  return(list(lambda_t_A      = lambda_t_A,
+              lambda_t_B      = lambda_t_B,
+              alpha           = alpha,
+              beta            = beta,
+              pi              = if (length(pi)>1) {mean(pi)} else {pi},
+              lambda_values_A = lambda_values_A,
+              growth_rates_A  = growth_rates_A,
+              lambda_values_B = lambda_values_B,
+              growth_rates_B  = growth_rates_B))
 }
 
 

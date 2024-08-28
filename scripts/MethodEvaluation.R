@@ -1,6 +1,10 @@
+################################################################################
+# Evaluation of model and method to analyse abundance of radiocarbon dates
+################################################################################
 source("scripts/DARthABC.R")
 require(rbenchmark)
 require(abcrf)
+#require(abc)
 require(ggplot2)
 results_directory = "results/method_evaluation"
 dir.create(results_directory)
@@ -67,7 +71,7 @@ if (!file.exists(bench_results_file)){
       dates_CRA = sim_CRA(dates, errors = errors)
       get_sumstats(dates_CRA, time_range, window = c(10,50,100,500))
     },
-    replications = 100)
+    replications = 300)
   save(bench_results, file = bench_results_file)
 }else{
   #load(file = bench_results_file)
@@ -124,7 +128,7 @@ if (!file.exists(RF_model_p_hist_file) ){
                                    ntree = 5000, paral = TRUE)
   save(RF_p_hist, file = RF_model_p_hist_file)
 }else{
-  # load(file = RF_model_p_hist_file)
+  #load(file = RF_model_p_hist_file)
 }
 
 RF_model_p_hist2_file = paste0(results_directory, "/RF_model_p_hist2.rda")
@@ -136,7 +140,7 @@ if (!file.exists(RF_model_p_hist2_file) ){
                        ntree = 5000, paral = TRUE)
   save(RF_p_hist2, file = RF_model_p_hist2_file)
 }else{
-  # load(file = RF_model_p_hist2_file)
+  #load(file = RF_model_p_hist2_file)
 }
 
 
@@ -225,7 +229,7 @@ if (!file.exists(RF_model_p_file) ){
                       ntree = 5000, paral = TRUE)
   save(RF_p, file = RF_model_p_file)
 }else{
-  # load(file = RF_model_p_file)
+  #load(file = RF_model_p_file)
 }
 results_RF_model_p_file = paste0(results_directory, "/results_RF_model_p.rda")
 if (!file.exists(results_RF_model_p_file) ){
@@ -246,7 +250,7 @@ if (!file.exists(results_RF_model_p_file) ){
                       paral=T)
   save(results_p, file=results_RF_model_p_file)
 }else{
-  # load(file=results_RF_model_p_file)
+  #load(file=results_RF_model_p_file)
 }
 
 RF_model_p_0_file = paste0(results_directory, "/RF_model_p_0.rda")
@@ -261,7 +265,7 @@ if (!file.exists(RF_model_p_0_file) ){
                     ntree = 5000, paral = TRUE)
   save(RF_p_0, file = RF_model_p_0_file)
 }else{
-  # load(file = RF_model_p_0_file)
+  #load(file = RF_model_p_0_file)
 }
 results_RF_model_p_0_file = paste0(results_directory, "/results_RF_model_p_0.rda")
 if (!file.exists(results_RF_model_p_0_file) ){
@@ -278,10 +282,11 @@ if (!file.exists(results_RF_model_p_0_file) ){
   results_p_0 = predict(RF_p_0,
                         obs = target_data,
                         training = data.frame(param,sumstats),
+                        quantiles = seq(0,1,0.005),
                         paral = T)
   save(results_p_0, file = results_RF_model_p_0_file)
 }else{
-  # load(file = results_RF_model_p_0_file)
+  #load(file = results_RF_model_p_0_file)
 }
 
 RF_model_p_f_file = paste0(results_directory, "/RF_model_p_f.rda")
@@ -291,12 +296,12 @@ if (!file.exists(RF_model_p_f_file) ){
   lambda_sumstats_names = names(reftable)[(1:num_of_sumstats) + num_of_param]
   p_sumstats_names = names(reftable)[(1:num_of_sumstats) + num_of_param + num_of_sumstats]
   sumstats = reftable[p_sumstats_names]
-  param    = reftable$p_f
+  param    = log10(reftable$p_f)
   RF_p_f = regAbcrf(param~., data.frame(param,sumstats),
                     ntree = 5000, paral = TRUE)
   save(RF_p_f, file = RF_model_p_f_file)
 }else{
-  # load(file = RF_model_p_f_file)
+  #load(file = RF_model_p_f_file)
 }
 results_RF_model_p_f_file = paste0(results_directory, "/results_RF_model_p_f.rda")
 if (!file.exists(results_RF_model_p_f_file) ){
@@ -305,7 +310,7 @@ if (!file.exists(results_RF_model_p_f_file) ){
   lambda_sumstats_names = names(reftable)[(1:num_of_sumstats) + num_of_param]
   p_sumstats_names = names(reftable)[(1:num_of_sumstats) + num_of_param + num_of_sumstats]
   sumstats = reftable[p_sumstats_names]
-  param    = reftable$p_f
+  param    = log10(reftable$p_f)
   load(file = RF_model_p_f_file)
   load(file = simulated_target_file)
   target_data = simulated_target_sumstats[which(simulated_target_sumstats$n == n),]
@@ -313,21 +318,12 @@ if (!file.exists(results_RF_model_p_f_file) ){
   results_p_f = predict(RF_p_f,
                         obs = target_data,
                         training = data.frame(param,sumstats),
+                        quantiles = seq(0,1,0.005),
                         paral = T)
   save(results_p_f, file = results_RF_model_p_f_file)
 }else{
-  # load(file = results_RF_model_p_f_file)
+  #load(file = results_RF_model_p_f_file)
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -343,7 +339,7 @@ if (!file.exists(RF_model_lambda_file) ){
                   ntree = 5000, paral = TRUE)
   save(RF_lambda, file = RF_model_lambda_file)
 }else{
-  # load(file = RF_model_lambda_file)
+  #load(file = RF_model_lambda_file)
 }
 results_RF_model_lambda_file = paste0(results_directory, "/results_RF_model_lambda.rda")
 if (!file.exists(results_RF_model_lambda_file) ){
@@ -355,7 +351,8 @@ if (!file.exists(results_RF_model_lambda_file) ){
   param    = reftable$rate
   load(file = RF_model_lambda_file)
   load(file = simulated_target_file)
-  target_data = simulated_target_sumstats[1:1000,]
+
+  target_data = simulated_target_sumstats[which(simulated_target_sumstats$n == n),] #simulated_target_sumstats[1:300,]
   results_lambda = predict(RF_lambda,
                       obs=target_data,
                       training=data.frame(param,sumstats),
@@ -379,7 +376,7 @@ if (!file.exists(RF_model_lambda_0_file) ){
                        ntree = 5000, paral = TRUE)
   save(RF_lambda_0, file = RF_model_lambda_0_file)
 }else{
-  # load(file = RF_model_lambda_0_file)
+  #load(file = RF_model_lambda_0_file)
 }
 results_RF_model_lambda_0_file = paste0(results_directory, "/results_RF_model_lambda_0.rda")
 if (!file.exists(results_RF_model_lambda_0_file) ){
@@ -390,10 +387,11 @@ if (!file.exists(results_RF_model_lambda_0_file) ){
   param    = log10(reftable$lambda_0)
   load(file = RF_model_lambda_0_file)
   load(file = simulated_target_file)
-  target_data = simulated_target_sumstats[which(simulated_target_sumstats$n==n),]
+  target_data = simulated_target_sumstats[which(simulated_target_sumstats$n == n),] #simulated_target_sumstats[1:300,]
   results_lambda_0 = predict(RF_lambda_0,
                            obs=target_data,
                            training=data.frame(param,sumstats),
+                           quantiles = seq(0,1,0.005),
                            paral=T)
   save(results_lambda_0, file=results_RF_model_lambda_0_file)
 }else{
@@ -408,12 +406,12 @@ if (!file.exists(RF_model_lambda_f_file) ){
   num_of_sumstats = (ncol(reftable) - num_of_param) / 2
   lambda_sumstats_names = names(reftable)[(1:num_of_sumstats) + num_of_param]
   sumstats = reftable[lambda_sumstats_names]
-  param    = reftable$lambda_f
+  param    = log10(reftable$lambda_f)
   RF_lambda_f = regAbcrf(param~., data.frame(param,sumstats),
                          ntree = 5000, paral = TRUE)
   save(RF_lambda_f, file = RF_model_lambda_f_file)
 }else{
-  # load(file = RF_model_lambda_f_file)
+  #load(file = RF_model_lambda_f_file)
 }
 results_RF_model_lambda_f_file = paste0(results_directory, "/results_RF_model_lambda_f.rda")
 if (!file.exists(results_RF_model_lambda_f_file) ){
@@ -421,16 +419,18 @@ if (!file.exists(results_RF_model_lambda_f_file) ){
   num_of_sumstats = (ncol(reftable) - num_of_param) / 2
   lambda_sumstats_names = names(reftable)[(1:num_of_sumstats) + num_of_param]
   sumstats = reftable[lambda_sumstats_names]
-  param    = reftable$lambda_f
+  param    = log10(reftable$lambda_f)
   load(file = RF_model_lambda_f_file)
   load(file = simulated_target_file)
-  target_data = simulated_target_sumstats[which(simulated_target_sumstats$n==n),]
+  target_data = simulated_target_sumstats[which(simulated_target_sumstats$n == n),] #simulated_target_sumstats[1:300,]
   results_lambda_f = predict(RF_lambda_f,
                              obs=target_data,
                              training=data.frame(param,sumstats),
+                             quantiles = seq(0,1,0.005),
                              paral=T)
   save(results_lambda_f, file=results_RF_model_lambda_f_file)
 }else{
   #load(file=results_RF_model_lambda_f_file)
 }
+
 
