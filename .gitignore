@@ -6,15 +6,5 @@ data/*
 logo/*
 results_old
 results_old/*
-doc/draft/*.pdf
-doc/draft/*.log
-doc/draft/*.dvi
-doc/draft/*.aux
-doc/draft/*.blg
-doc/draft/*.bbl
-doc/draft/*.bcf
-doc/draft/*.run.xml
-doc/draft/*.out
-doc/draft/*.bak
-doc/draft/diff.tex
-
+doc/*
+README.html
