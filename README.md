@@ -2,11 +2,11 @@
 
 This repository contains a set of scripts in R that implement the method described in "Analysis of the Abundance of Radiocarbon Samples without the Sum of Probability Distributions" by Miguel de Navascués, Concetta Burgarella and Mattias Jakobsson (2024) [doi:10.5281/zenodo.13381596](https://doi.org/10.5281/zenodo.13381596).
 
+### Vignette
+
+A vignette is included with a simple example. After reading the publication, use this as a starting point for undersanding how to apply the functions in your own analysis.
+
 ### Scripts
-
-#### Application file: Example.R
-
-File that contains an example application. Start here (after reading the publication) if you intend to apply the method to your data.
 
 #### Main file: DARthABC.R
 
@@ -25,15 +25,18 @@ Other files correspond to work in progress and will be described in the future.
 
 ### Requirements (R packages)
 
+These scripts have been tested in R 4.1.2. The following packages are required (with corresponding version tested):
+
 DARthABC:
 
-- rcarbon
-- weights
-- extraDistr
+- rcarbon (1.5.1)
+- weights (4.1.2)
+- extraDistr (1.9.1)
 
-Scripts that apply the moethod to data:
+Scripts that apply the method to data:
 
-- abcrf
-- doSNOW
-- doParallel
-- doRNG
+- abcrf (1.9)
+- doSNOW (1.0.20)
+- doParallel (1.0.17)
+- doRNG (1.8.6)
+

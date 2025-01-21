@@ -641,7 +641,7 @@ if ( !file.exists(piecewise_model_inference_file) ){
        rate_error,
        file=piecewise_model_inference_file)
 }else{
-  #load(file=piecewise_model_inference_file)
+  load(file=piecewise_model_inference_file)
 }
 
 piecewise_model_result_lambda_plot_file = paste0(results_directory, "/piecewise_model_result_lambda.pdf")
@@ -673,10 +673,33 @@ if (!file.exists(piecewise_model_result_rate_plot_file)){
   lines(step_wise_years,rep(rate_95CI_low,each=2),lty=3, lwd=2,col=PCI_blue)
   lines(step_wise_years,rep(rate_95CI_upp,each=2),lty=3, lwd=2,col=PCI_blue)
   abline(h=0,col="gray")
-  points( skyline_years[which(rate_95CI_low>0)]-196.5, rep(0,sum(rate_95CI_low>0)),
-          pch="*", cex=2)
-  points( skyline_years[which(rate_95CI_upp<0)]-196.5, rep(0,sum(rate_95CI_upp<0)),
-          pch="*", cex=2)
+  
+  # Add translucent grey bands where rate_95CI_low > 0
+  regions_low <- which(rate_95CI_low > 0)
+  if (length(regions_low) > 0) {
+    for (i in regions_low) {
+      x_band <- step_wise_years[c((i - 1) * 2 + 1, (i - 1) * 2 + 2)]
+      y_band <- c(-0.006, -0.006, 0.006, 0.006) # Y-coordinates for the rectangle
+      polygon(c(x_band, rev(x_band)), y_band, col = rgb(44, 110.4, 148.3, 50, maxColorValue = 255), border = NA)
+    }
+  }
+  
+  # Add translucent grey bands where rate_95CI_upp < 0
+  regions_upp <- which(rate_95CI_upp < 0)
+  if (length(regions_upp) > 0) {
+    for (i in regions_upp) {
+      x_band <- step_wise_years[c((i - 1) * 2 + 1, (i - 1) * 2 + 2)]
+      y_band <- c(-0.006, -0.006, 0.006, 0.006) # Y-coordinates for the rectangle
+      polygon(c(x_band, rev(x_band)), y_band, col = rgb(44, 110.4, 148.3, 50, maxColorValue = 255), border = NA)
+    }
+  }
+  
+  
+  #points( skyline_years[which(rate_95CI_low>0)]-196.5, rep(0,sum(rate_95CI_low>0)),
+  #        pch="*", cex=2)
+  #points( skyline_years[which(rate_95CI_upp<0)]-196.5, rep(0,sum(rate_95CI_upp<0)),
+  #        pch="*", cex=2)
+  
   text(time_range_BP[1],0.006,"b",cex=2)
   dev.off()
 }
